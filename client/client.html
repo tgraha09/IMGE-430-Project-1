@@ -105,25 +105,20 @@
             tag: tagValue, 
             option
           }
-          
-         // recipeTags.recipeTags.push(tagValue)
-          //option.setAttribute("searchTag", tagValue)
           option.value = tagValue
           //option.text = tagName
           recipeTags.append(option)
         
-          });
+        });
           
-          searchform.onsubmit = (f)=>{
-            //console.log('action', f);
-            console.log("OK");//food=${food}&tag=${tag}
-            let route = `/recipe-client?food=${food}&tag=${tag}`
-            searchform.action = route
-            //console.log(tag);
-          }
-          
-          
-          
+        searchform.onsubmit = (f)=>{
+          //console.log('action', f);
+          console.log("OK");//food=${food}&tag=${tag}
+          let route = `/recipe-client?food=${food}&tag=${tag}`
+          searchform.action = route
+          //console.log(tag);
+        }
+
         })
 
         
