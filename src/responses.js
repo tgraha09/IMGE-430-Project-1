@@ -119,15 +119,15 @@ const getRandomJokesJSON = (request, response, params, acceptedTypes, httpMethod
 };
 
 const getRecipesJSON = (request, response, params, acceptedTypes, httpMethod) => {
-  
-  /*const { limit } = params.query;
+
+  /* const { limit } = params.query;
   const randomJokes = getRandomJoke(limit);
   if (acceptedTypes.includes('text/xml')) {
     const xmlContent = getJokesXML(randomJokes);
     respond(request, response, xmlContent, 'text/xml');
   } else {
     respond(request, response, randomJokes, 'application/json');
-  }*/
+  } */
 };
 
 module.exports = {

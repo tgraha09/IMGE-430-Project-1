@@ -21,7 +21,7 @@ const urlStruct = {
     '/random-joke': responseHandler.getRandomJokesJSON,
     '/random-jokes': responseHandler.getRandomJokesJSON,
     '/default-styles.css': htmlHandler.getDefaultCSS,
-    '/recipe-client':htmlHandler.getRecipeClient,
+    '/recipe-client': htmlHandler.getRecipeClient,
     notFound: htmlHandler.get404Response,
   },
   HEAD: {
@@ -41,12 +41,12 @@ const onRequest = (request, response) => {
   const params = url.parse(path, true);
   const { pathname } = params;
   const acceptedTypes = request.headers.accept.split(',');
-  //getTags()
-  //console.log(path, pathname);
+  // getTags()
+  // console.log(path, pathname);
   // console.log(request.headers);
   const httpMethod = request.method;
   if (urlStruct[httpMethod][pathname]) {
-    //console.log(params);
+    // console.log(params);
     urlStruct[httpMethod][pathname](request, response, params, acceptedTypes, httpMethod);
   } else {
     urlStruct[httpMethod].notFound(request, response);

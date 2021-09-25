@@ -42,5 +42,5 @@ module.exports = {
   get404Response,
   getDefaultCSS,
   getJokeClient,
-  getRecipeClient
+  getRecipeClient,
 };
