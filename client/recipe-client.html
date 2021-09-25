@@ -28,9 +28,9 @@
           //console.log("e.target", e.target);
           //console.log("e.target.response = ", e.target.response);
           //const results = JSON.parse(e.target.response).results
-          //localStorage.setItem("results", e.target.response)
+          localStorage.setItem("results", e.target.response)
           
-          displayRecipies(e.target.response)
+          //displayRecipies(e.target.response)
           /*let container = document.querySelector('#jokeContainer')
           
           obj.forEach(joke => {
@@ -96,10 +96,9 @@
         console.log("Project 1 Init");
         downloadRecipes()
         
-       /* getStorage("results", (dataString)=>{
+        getStorage("results", (dataString)=>{
           displayRecipies(dataString)
-          
-        })*/
+        })
         
       }
       
