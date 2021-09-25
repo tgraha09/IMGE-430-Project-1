@@ -9,7 +9,7 @@
       Random Joke Web Service - the endpoint is here --> 
       <a href="/random-joke">random-joke</a> or <a href="/random-jokes?limit=10">random-jokes?limit=10</a>
     </p>
-    <form id="searchform">
+    <form id="searchform" method="POST">
       <div>
         <label for="food">Food Name or Ingredient</label><br>
         <input type="text" id="food" name="food" value="Chicken"><br>
@@ -25,63 +25,7 @@
     </form> 
     <input id="submitbtn" type="submit" form="searchform"></input>
     <script>
-      //type="submit" form="searchform"
-      //type="submit" form="searchform"
-      /*<label for="">Choose a car:</label>
-      <input type="text" list="recipeTags" >*/
-      //const getRequest = require('.')
-      const handleResponse = (e) =>{
-          console.log("e.target", e.target);
-          console.log("e.target.response = ", e.target.response);
-          const obj = JSON.parse(e.target.response);
-          let container = document.querySelector('#jokeContainer')
-          console.log(obj);
-          obj.forEach(joke => {
-              container.innerHTML += `<section><h3>${joke.q}</h3>
-                                  <h3>${joke.a}</h3></section>`
-          });
-      }
-
-      const downloadJoke = (e) => {
-        
-        // remember that an `Event` object gets passed along every time that an event handler or listener calls a function
-        // the `target` property of that event points at the element that sent the event, in this case a button
-        console.log(`An element of id=${e.target.id} was clicked!`);
-        
-        const jokeURL = "/random-joke";
-        const xhr = new XMLHttpRequest();
-        xhr.onload = handleResponse;
-        xhr.open("GET", jokeURL);
-
-        xhr.setRequestHeader('Accept', "application/javascript");
-        xhr.send();
-      }
-
-      const downloadFiveJokes = (e) => {
-        // remember that an `Event` object gets passed along every time that an event handler or listener calls a function
-        // the `target` property of that event points at the element that sent the event, in this case a button
-        console.log(`An element of id=${e.target.id} was clicked!`);
-
-        const jokeURL = "/random-jokes?limit=5";
-        const xhr = new XMLHttpRequest();
-        xhr.onload = handleResponse;
-        xhr.open("GET", jokeURL);
-        xhr.setRequestHeader('Accept', "application/javascript");
-        xhr.send();
-      }
-
-      const sendAjax = (url, method, acceptedType) => {
-        console.log(url,acceptedType);
-        const xhr = new XMLHttpRequest();
-        
-        xhr.open(method, url);
-        xhr.setRequestHeader('Accept', acceptedType);
-        
-        xhr.onload = () => handleResponse(xhr);
     
-        xhr.send();
-        
-      };
 
       const init = () => {
         getTags()
@@ -112,20 +56,16 @@
         });
           
         searchform.onsubmit = (f)=>{
-          //console.log('action', f);
-          console.log("OK");//food=${food}&tag=${tag}
-          let route = `/recipe-client?food=${food}&tag=${tag}`
+          console.log(recipeTagInput.value);
+          let tag = recipeTagInput.value
+          let food = searchFood.value
+          let route = `/recipe?food=${food}&tag=${tag}`
           searchform.action = route
           //console.log(tag);
         }
 
-        })
+      })
 
-        
-        
-        
-        
-        
       }
       
 

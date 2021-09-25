@@ -1,4 +1,5 @@
-const http = require("https");
+const http = require('https');
+
 const jokes = [
 
   {
@@ -120,49 +121,42 @@ const getRandomJokesJSON = (request, response, params, acceptedTypes, httpMethod
 };
 
 const getRecipesJSON = (request, response, params, acceptedTypes, httpMethod) => {
-  let query = params.query
+  const { query } = params;
   const options = {
-    "method": "GET",
-    "hostname": "tasty.p.rapidapi.com",
-    "port": null,
-    "path": `/recipes/list?from=0&size=20&tags=${query.tag}&q=${query.food}`,
-    "headers": {
-      "x-rapidapi-host": "tasty.p.rapidapi.com",
-      "x-rapidapi-key": "170e038a70mshc48a677384b7b29p120f51jsn123cfd31d18c",
-      "useQueryString": true
-    }
+    method: 'GET',
+    hostname: 'tasty.p.rapidapi.com',
+    port: null,
+    path: `/recipes/list?from=0&size=20&tags=${query.tag}&q=${query.food}`,
+    headers: {
+      'x-rapidapi-host': 'tasty.p.rapidapi.com',
+      'x-rapidapi-key': '170e038a70mshc48a677384b7b29p120f51jsn123cfd31d18c',
+      useQueryString: true,
+    },
   };
-  
-  const req = http.request(options, function (res) {
+
+  const req = http.request(options, (res) => {
     const chunks = [];
-  
-    res.on("data", function (chunk) {
+
+    res.on('data', (chunk) => {
       chunks.push(chunk);
     });
-  
-    res.on("end", function () {
-      const body = JSON.parse(Buffer.concat(chunks).toString())
-      
-      //console.log(body);
+
+    res.on('end', () => {
+      const body = JSON.parse(Buffer.concat(chunks).toString());
+
+      // console.log(body);
       respond(request, response, JSON.stringify(body), 'application/json');
     });
   });
-  
+
   req.end();
-  /* const { limit } = params.query;
-  const randomJokes = getRandomJoke(limit);
-  if (acceptedTypes.includes('text/xml')) {
-    const xmlContent = getJokesXML(randomJokes);
-    respond(request, response, xmlContent, 'text/xml');
-  } else {
-    respond(request, response, randomJokes, 'application/json');
-  } */
+  
 };
 
 module.exports = {
   getRandomJokesJSON,
   getRandomJokesMeta,
   notFound,
-  getRecipesJSON
+  getRecipesJSON,
 
 };

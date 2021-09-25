@@ -5,53 +5,11 @@
   </head>
   <body>
     <h1>RECIPE PAGE</h1>
-    
+    <div id="content"></div>
     
     <script>
-      //type="submit" form="searchform"
-      //type="submit" form="searchform"
-      /*<label for="">Choose a car:</label>
-      <input type="text" list="recipeTags" >*/
-      //const getRequest = require('.')
-      const handleResponse = (e) =>{
-          console.log("e.target", e.target);
-          console.log("e.target.response = ", e.target.response);
-          const obj = JSON.parse(e.target.response);
-          let container = document.querySelector('#jokeContainer')
-          console.log(obj);
-          obj.forEach(joke => {
-              container.innerHTML += `<section><h3>${joke.q}</h3>
-                                  <h3>${joke.a}</h3></section>`
-          });
-      }
 
-      const downloadJoke = (e) => {
-        
-        // remember that an `Event` object gets passed along every time that an event handler or listener calls a function
-        // the `target` property of that event points at the element that sent the event, in this case a button
-        console.log(`An element of id=${e.target.id} was clicked!`);
-        
-        const jokeURL = "/random-joke";
-        const xhr = new XMLHttpRequest();
-        xhr.onload = handleResponse;
-        xhr.open("GET", jokeURL);
-
-        xhr.setRequestHeader('Accept', "application/javascript");
-        xhr.send();
-      }
-
-      const downloadFiveJokes = (e) => {
-        // remember that an `Event` object gets passed along every time that an event handler or listener calls a function
-        // the `target` property of that event points at the element that sent the event, in this case a button
-        console.log(`An element of id=${e.target.id} was clicked!`);
-
-        const jokeURL = "/random-jokes?limit=5";
-        const xhr = new XMLHttpRequest();
-        xhr.onload = handleResponse;
-        xhr.open("GET", jokeURL);
-        xhr.setRequestHeader('Accept', "application/javascript");
-        xhr.send();
-      }
+      
 
       const sendAjax = (url, method, acceptedType) => {
         console.log(url,acceptedType);
@@ -60,76 +18,88 @@
         xhr.open(method, url);
         xhr.setRequestHeader('Accept', acceptedType);
         
-        xhr.onload = () => handleResponse(xhr);
+        xhr.onload = () => handleRecipies(xhr);
     
         xhr.send();
         
       };
 
+      const handleRecipies = (e) =>{
+          //console.log("e.target", e.target);
+          //console.log("e.target.response = ", e.target.response);
+          //const results = JSON.parse(e.target.response).results
+          //localStorage.setItem("results", e.target.response)
+          
+          displayRecipies(e.target.response)
+          /*let container = document.querySelector('#jokeContainer')
+          
+          obj.forEach(joke => {
+              container.innerHTML += `<section><h3>${joke.q}</h3>
+                                  <h3>${joke.a}</h3></section>`
+          });*/
+      }
+
+      const downloadRecipes = () => {
+        // remember that an `Event` object gets passed along every time that an event handler or listener calls a function
+        // the `target` property of that event points at the element that sent the event, in this case a button
+        //console.log(`An element of id=${e.target.id} was clicked!`);
+        let params = (new URL(document.location)).searchParams;
+        let food = params.get("food");
+        let tag = params.get("tag");
+        //console.log(food);
+        const foodURL = `/recipe-json?food=${food}&tag=${tag}`;
+        const xhr = new XMLHttpRequest();
+        xhr.onload = handleRecipies
+        xhr.open("GET", foodURL);
+        xhr.setRequestHeader('Accept', "application/javascript");
+        xhr.send();
+      }
+
+      const displayRecipies = (dataString)=>{
+        console.log("Parsing Recipies");
+        let content = document.body.querySelector('#content')
+        let data = JSON.parse(dataString).results
+        data.forEach(json => {
+          let recipe = {
+            name: json.name,
+            description: json.description,
+            country: json.country,
+            language: json.language,
+            prepTimeMinutes: json.prep_time_minutes,
+            cookTimeMinutes: json.cook_time_minutes,
+            totalTimeMinutes: json.total_time_minutes,
+            timeTier: json.total_time_tier,
+            num_servings: json.num_servings,
+            video: json.original_video_url,
+            instructions: json.instructions,
+            nutrition: json.nutrition,
+            tags: json.tags,
+            feed: json.recirc_feeds,
+            credits: json.credits,
+            thumbnail: json.thumbnail_url,
+            topics: json.topics,
+            rating: json.user_ratings
+          }
+          let element = 
+          `<recipe> 
+            <img id="thumb" src=${recipe.thumbnail}> </img>
+            <h2>${recipe.name}</h2>
+              <p>${recipe.description}</p>
+              
+            </recipe>`
+            content.innerHTML += element
+          console.log(recipe);
+        });
+      }
+
       const init = () => {
         console.log("Project 1 Init");
+        downloadRecipes()
         
-        
-        /*getStorage("tagsList",(data)=>{
-          let tags = JSON.parse(data).results
-          tags.forEach(tag => {
-          //console.log(tag);
-          let tagValue = tag.name
-          let tagName = tag.display_name
-          let option = document.createElement("option")
-          option.id ="tag"
-          recipeTagInput.recipeTags[tagName] = {
-            tag: tagValue, 
-            option
-          }
-         // recipeTags.recipeTags.push(tagValue)
-          //option.setAttribute("searchTag", tagValue)
-          option.value = tagName
-          //option.text = tagName
-          recipeTags.append(option)
-        
-          });
-          
-          recipeTagInput.addEventListener("change", (e)=>{
-           // let tag = e.target.value
-            let searchTagObj = e.target.recipeTags[recipeTagInput.value]
-            let option = searchTagObj.option
-            let tag = searchTagObj.tag
-            //option.value = tag
-            console.log(option, tag);
-            //console.log(recipeTagInput.recipeTags[tag]);
-            //option.text = recipeTagInput.recipeTags[tagName]
-            //console.log(e);
-            
-          })
-          document.body.querySelector('#submitbtn').addEventListener("click", (e)=>{
-            if(recipeTagInput.value != undefined && recipeTagInput.value != "" && 
-            searchFood.value != undefined && searchFood.value != ""){
-              let searchTagObj = recipeTagInput.recipeTags[recipeTagInput.value]
-              let option = searchTagObj.option
-              let tag = searchTagObj.tag
-              option.value = tag
-              console.log(option, tag);
-              sendAjax('/random-joke', 'GET', 'application/json')
-              //let food = searchFood.value
-              //getRecipes(food, searchTag)
-             /* getStorage('recipies', (dataString)=>{
-                let results = JSON.parse(dataString)
-                console.log(dataString);
-              })
-              
-            }
-            else{
-              console.log("No Entry");
-            }
-          })
+       /* getStorage("results", (dataString)=>{
+          displayRecipies(dataString)
           
         })*/
-
-        
-        
-        
-        
         
       }
       

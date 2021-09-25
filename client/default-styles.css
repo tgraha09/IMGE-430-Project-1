@@ -1,2 +1,16 @@
 *{font-family: sans-serif;}
 
+#content{
+    display: flex;
+    flex-direction: column;
+}
+
+#thumb{
+    max-width: 400px;
+    max-height: 300px;
+}
+recipe{
+    display: inline-block;
+    border-style: dotted;
+    max-width: 600px;
+}
