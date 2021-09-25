@@ -1,0 +1,231 @@
+<html>
+  <head>
+    <title>Project 1</title>
+    <link href="default-styles.css" type="text/css" rel="stylesheet" />
+  </head>
+  <body>
+    <h1>RECIPE PAGE</h1>
+    
+    <form id="searchform">
+      <div>
+        <label for="food">Food Name or Ingredient</label><br>
+        <input type="text" id="food" name="food" value="Chicken"><br>
+      </div>
+      
+      <div id="tagWrap">
+        <label for="tag">Select Tag</label><br>
+        <input class="tagInput" type="text" name="tag" list="recipeTags"/>
+        <datalist  name="recipeTags" id="recipeTags">
+          <option id="tag" value=""></option>
+        </datalist>
+      </div>
+    </form> 
+    <button id="submitbtn">Submit</button>
+    <script>
+      //type="submit" form="searchform"
+      //type="submit" form="searchform"
+      /*<label for="">Choose a car:</label>
+      <input type="text" list="recipeTags" >*/
+      //const getRequest = require('.')
+      const handleResponse = (e) =>{
+          console.log("e.target", e.target);
+          console.log("e.target.response = ", e.target.response);
+          const obj = JSON.parse(e.target.response);
+          let container = document.querySelector('#jokeContainer')
+          console.log(obj);
+          obj.forEach(joke => {
+              container.innerHTML += `<section><h3>${joke.q}</h3>
+                                  <h3>${joke.a}</h3></section>`
+          });
+      }
+
+      const downloadJoke = (e) => {
+        
+        // remember that an `Event` object gets passed along every time that an event handler or listener calls a function
+        // the `target` property of that event points at the element that sent the event, in this case a button
+        console.log(`An element of id=${e.target.id} was clicked!`);
+        
+        const jokeURL = "/random-joke";
+        const xhr = new XMLHttpRequest();
+        xhr.onload = handleResponse;
+        xhr.open("GET", jokeURL);
+
+        xhr.setRequestHeader('Accept', "application/javascript");
+        xhr.send();
+      }
+
+      const downloadFiveJokes = (e) => {
+        // remember that an `Event` object gets passed along every time that an event handler or listener calls a function
+        // the `target` property of that event points at the element that sent the event, in this case a button
+        console.log(`An element of id=${e.target.id} was clicked!`);
+
+        const jokeURL = "/random-jokes?limit=5";
+        const xhr = new XMLHttpRequest();
+        xhr.onload = handleResponse;
+        xhr.open("GET", jokeURL);
+        xhr.setRequestHeader('Accept', "application/javascript");
+        xhr.send();
+      }
+
+      const sendAjax = (url, method, acceptedType) => {
+        console.log(url,acceptedType);
+        const xhr = new XMLHttpRequest();
+        
+        xhr.open(method, url);
+        xhr.setRequestHeader('Accept', acceptedType);
+        
+        xhr.onload = () => handleResponse(xhr);
+    
+        xhr.send();
+        
+      };
+
+      const init = () => {
+        console.log("Project 1 Init");
+        let recipeTags = document.body.querySelector('#recipeTags')
+        let recipeTagInput = document.body.querySelector('.tagInput')
+        recipeTagInput.recipeTags = []
+        //console.log(recipeTagInput.recipeTags);
+        let searchFood = document.body.querySelector('#food')
+        recipeTagInput.value = ""
+        
+        /*getStorage("tagsList",(data)=>{
+          let tags = JSON.parse(data).results
+          tags.forEach(tag => {
+          //console.log(tag);
+          let tagValue = tag.name
+          let tagName = tag.display_name
+          let option = document.createElement("option")
+          option.id ="tag"
+          recipeTagInput.recipeTags[tagName] = {
+            tag: tagValue, 
+            option
+          }
+         // recipeTags.recipeTags.push(tagValue)
+          //option.setAttribute("searchTag", tagValue)
+          option.value = tagName
+          //option.text = tagName
+          recipeTags.append(option)
+        
+          });
+          
+          recipeTagInput.addEventListener("change", (e)=>{
+           // let tag = e.target.value
+            let searchTagObj = e.target.recipeTags[recipeTagInput.value]
+            let option = searchTagObj.option
+            let tag = searchTagObj.tag
+            //option.value = tag
+            console.log(option, tag);
+            //console.log(recipeTagInput.recipeTags[tag]);
+            //option.text = recipeTagInput.recipeTags[tagName]
+            //console.log(e);
+            
+          })
+          document.body.querySelector('#submitbtn').addEventListener("click", (e)=>{
+            if(recipeTagInput.value != undefined && recipeTagInput.value != "" && 
+            searchFood.value != undefined && searchFood.value != ""){
+              let searchTagObj = recipeTagInput.recipeTags[recipeTagInput.value]
+              let option = searchTagObj.option
+              let tag = searchTagObj.tag
+              option.value = tag
+              console.log(option, tag);
+              sendAjax('/random-joke', 'GET', 'application/json')
+              //let food = searchFood.value
+              //getRecipes(food, searchTag)
+             /* getStorage('recipies', (dataString)=>{
+                let results = JSON.parse(dataString)
+                console.log(dataString);
+              })
+              
+            }
+            else{
+              console.log("No Entry");
+            }
+          })
+          
+        })*/
+
+        
+        
+        
+        
+        
+      }
+      
+
+      const getRecipes = (food, tag)=>{
+        const data = null;
+        const xhr = new XMLHttpRequest();
+        xhr.withCredentials = false;
+
+        xhr.addEventListener("readystatechange", function () {
+          if (this.readyState === this.DONE) {
+            console.log(this.responseText);
+            localStorage.setItem("recipies", this.responseText)
+          }
+        });
+
+        xhr.open("GET", "https://tasty.p.rapidapi.com/recipes/list?from=0&size=20&tags="+tag+"&q="+food);
+        xhr.setRequestHeader("x-rapidapi-host", "tasty.p.rapidapi.com");
+        xhr.setRequestHeader("x-rapidapi-key", "170e038a70mshc48a677384b7b29p120f51jsn123cfd31d18c");
+
+        xhr.send(data);
+      }
+      const getSessionStorage=(key, callback)=>{
+        let data = undefined
+        let time = setInterval(function (){
+            data = sessionStorage.getItem(key) 
+            
+            if(data != "" && data != null){
+                
+              callback(data)
+              clearInterval(time)
+                
+            }
+        }, 200);
+
+      }
+      const getStorage=(key, callback)=>{
+        let data = undefined
+        let time = setInterval(function (){
+            data = localStorage.getItem(key) 
+            
+            if(data != "" && data != null){
+              data = callback(data)
+              clearInterval(time)
+              //data = callback(data)
+              //return data
+              //console.log(data);  
+            }
+           // return data
+        }, 200); 
+        //console.log(time);  
+      }
+
+      
+
+      const getTags = ()=>{
+        const data = null;
+        const xhr = new XMLHttpRequest();
+        //xhr.withCredentials = true;
+        xhr.withCredentials = false
+
+        xhr.addEventListener("readystatechange", function () {
+          if (this.readyState === this.DONE) {
+            localStorage.setItem("tagsList", this.responseText)
+            //console.log(this.responseText);
+          }
+        });
+
+        xhr.open("GET", "https://tasty.p.rapidapi.com/tags/list");
+        xhr.setRequestHeader("x-rapidapi-host", "tasty.p.rapidapi.com");
+        xhr.setRequestHeader("x-rapidapi-key", "170e038a70mshc48a677384b7b29p120f51jsn123cfd31d18c");
+        
+        xhr.send(data);
+      }
+      
+      window.onload = init;
+     
+    </script>
+  </body>
+</html>
