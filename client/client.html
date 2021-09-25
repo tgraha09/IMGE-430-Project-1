@@ -28,12 +28,14 @@
     
 
       const init = () => {
+        localStorage.clear()
+
         console.log("Project 1 Init");
         getTags()
         let recipeTags = document.body.querySelector('#recipeTags')
         let recipeTagInput = document.body.querySelector('.tagInput')
         recipeTagInput.recipeTags = []
-        //console.log(recipeTagInput.recipeTags);
+        
         let searchFood = document.body.querySelector('#food')
         recipeTagInput.value = ""
         let searchform = document.body.querySelector('#searchform')
