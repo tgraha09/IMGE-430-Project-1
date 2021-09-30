@@ -1,9 +1,9 @@
 const { log } = require('console');
 const http = require('https');
-let query = require('querystring');
+const query = require('querystring');
 
-let userSearchParameters = []
-let searchIdx = -1;
+const userSearchParameters = [];
+const searchIdx = -1;
 const jokes = [
 
   {
@@ -115,7 +115,7 @@ const getRandomJokesMeta = (request, response, params, acceptedTypes, httpMethod
 
 const getRandomJokesJSON = (request, response, params, acceptedTypes, httpMethod) => {
   const { limit } = params.query;
-  //console.log(params);
+  // console.log(params);
   const randomJokes = getRandomJoke(limit);
   if (acceptedTypes.includes('text/xml')) {
     const xmlContent = getJokesXML(randomJokes);
@@ -125,31 +125,15 @@ const getRandomJokesJSON = (request, response, params, acceptedTypes, httpMethod
   }
 };
 
-const getRecipesJSON = (request, response, params, acceptedTypes, httpMethod) => {
-  console.log("Get Recipe");
-  //console.log(userSearchParameters);
-  if(userSearchParameters.length==0){
-    postRecipesJSON(request, response, params, acceptedTypes, httpMethod)
-  }
-  else{
-    respond(request, response, JSON.stringify(userSearchParameters), 'application/json');
-  }
- };
-
-
-
 const postRecipesJSON = (request, response, params, acceptedTypes, httpMethod) => {
- 
-  let { food, tag, click} = params.query;
-  if(click != undefined){
-    console.log("POSTING");
-    if(food == undefined || tag == undefined){
-      //food="ok"
+  const { food, tag, click } = params.query;
+  if (click !== undefined) {
+    console.log('POSTING');
+    if (food === undefined || tag === undefined) {
+      // food="ok"
       console.log(userSearchParameters);
       respond(request, response, JSON.stringify(userSearchParameters), 'application/json');
-      return
-    }
-    else{
+    } else {
       const options = {
         method: 'GET',
         hostname: 'tasty.p.rapidapi.com',
@@ -161,21 +145,20 @@ const postRecipesJSON = (request, response, params, acceptedTypes, httpMethod) =
           useQueryString: true,
         },
       };
-    
+
       const req = http.request(options, (res) => {
         const chunks = [];
-    
+
         res.on('data', (chunk) => {
           chunks.push(chunk);
         });
-    
+
         res.on('end', () => {
           const body = JSON.parse(Buffer.concat(chunks).toString());
-          let results = []
-          //console.log(body);
-          body.results.forEach(json => {
-            
-            let recipeObj = {
+          const results = [];
+          // console.log(body);
+          body.results.forEach((json) => {
+            const recipeObj = {
               name: json.name,
               description: json.description,
               country: json.country,
@@ -193,68 +176,55 @@ const postRecipesJSON = (request, response, params, acceptedTypes, httpMethod) =
               credits: JSON.stringify(json.credits),
               thumbnail: json.thumbnail_url,
               topics: JSON.stringify(json.topics),
-              rating: JSON.stringify(json.user_ratings)
-            }
-            results.push(recipeObj)
-            
+              rating: JSON.stringify(json.user_ratings),
+            };
+            results.push(recipeObj);
           });
-          //console.log(arr);
-          //console.log(body);
+          // console.log(arr);
+          // console.log(body);
           userSearchParameters.push({
-            searchedAt:new Date(),
-            food:food,
-            tag:tag,
-            results:results
-          })
-          
-          let idx = 0; 
-          for (let i = 0; i < userSearchParameters.length; i++) {
+            searchedAt: new Date(),
+            food,
+            tag,
+            results,
+          });
+
+          let idx = 0;
+          for (let i = 0; i < userSearchParameters.length; i += 1) {
             const recipeObj = userSearchParameters[i];
-            if(recipeObj.food == food && recipeObj.tag == tag){
-              idx = i
+            if (recipeObj.food === food && recipeObj.tag === tag) {
+              idx = i;
             }
-            
           }
-          //console.log(userSearchParameters[idx]);
+          // console.log(userSearchParameters[idx]);
           respond(request, response, JSON.stringify(userSearchParameters), 'application/json');
-          /*
-          if(userSearchParameters[idx].food == food && userSearchParameters[idx].tag == tag){
-            console.log("Write idx");
-            respond(request, response, JSON.stringify(userSearchParameters[idx]), 'application/json');
-          }
-          else{
-            console.log("Write");
-            respond(request, response, JSON.stringify(userSearchParameters), 'application/json');
-          }*/
-          //searchParameters[searchIdx].results = body.results
-          //console.log(searchParameters[searchIdx]);
-          
         });
       });
-    
+
       req.end();
-      return
     }
-  }
-  else{
+  } else {
     console.log(userSearchParameters);
     respond(request, response, JSON.stringify(userSearchParameters), 'application/json');
   }
-  //console.log(click);
-  
-  
+  // console.log(click);
 };
 
-
-
-
+const getRecipesJSON = (request, response, params, acceptedTypes, httpMethod) => {
+  console.log('Get Recipe');
+  // console.log(userSearchParameters);
+  if (userSearchParameters.length === 0) {
+    postRecipesJSON(request, response, params, acceptedTypes, httpMethod);
+  } else {
+    respond(request, response, JSON.stringify(userSearchParameters), 'application/json');
+  }
+};
 
 module.exports = {
   getRandomJokesJSON,
   getRandomJokesMeta,
   notFound,
   getRecipesJSON,
-  postRecipesJSON
-  
+  postRecipesJSON,
 
 };

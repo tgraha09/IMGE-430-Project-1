@@ -22,13 +22,13 @@ const urlStruct = {
     '/random-joke': responseHandler.getRandomJokesJSON,
     '/random-jokes': responseHandler.getRandomJokesJSON,
     '/default-styles.css': htmlHandler.getDefaultCSS,
-    
-    '/recipes-json':responseHandler.getRecipesJSON,
+
+    '/recipes-json': responseHandler.getRecipesJSON,
     '/recipes-client': htmlHandler.getRecipeClient,
     '/recipe': htmlHandler.getRecipeHTML,
     notFound: htmlHandler.get404Response,
   },
-  POST:{
+  POST: {
     '/recipes-json': responseHandler.postRecipesJSON,
   },
   HEAD: {
@@ -42,8 +42,6 @@ const urlStruct = {
 // this time we will look at the `pathname`, and send back the appropriate page
 // note that in this course we'll be using arrow functions 100% of the time in our server-side code
 
-
-
 const onRequest = (request, response) => {
   // console.log(request.headers);
   const path = request.url;// request.url
@@ -55,9 +53,9 @@ const onRequest = (request, response) => {
   // console.log(request.headers);
   const httpMethod = request.method;
   console.log(httpMethod, pathname);
-  //console.log(httpMethod);
+  // console.log(httpMethod);
   if (urlStruct[httpMethod][pathname]) {
-    //console.log(params.query);
+    // console.log(params.query);
     urlStruct[httpMethod][pathname](request, response, params, acceptedTypes, httpMethod);
   } else {
     urlStruct[httpMethod].notFound(request, response);

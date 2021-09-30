@@ -50,5 +50,5 @@ module.exports = {
   getDefaultCSS,
   getJokeClient,
   getRecipeClient,
-  getRecipeHTML
+  getRecipeHTML,
 };
