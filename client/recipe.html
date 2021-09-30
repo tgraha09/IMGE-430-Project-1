@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <title>Document</title>
+    <link href="default-styles.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+    <h2>SELECTED RECIPE</h2>
+    <script>
+
+      
+
+        const sendAjax = (url, method, acceptedType) => {
+          console.log(url,acceptedType);
+          const xhr = new XMLHttpRequest();
+          
+          xhr.open(method, url);
+          xhr.setRequestHeader('Accept', acceptedType);
+          
+          xhr.onload = () => handleRecipies(xhr);
+      
+          xhr.send();
+          
+        };
+  
+        const handleRecipies = (e) =>{
+            //console.log("e.target", e.target);
+            //console.log("e.target.response = ", e.target.response);
+            //const results = JSON.parse(e.target.response).results
+            localStorage.setItem("results", e.target.response)
+            
+            
+        }
+  
+        
+        
+        //Function found from stack overflow from user "Gibolt"
+        function encodeQueryData(data) {
+          //https://stackoverflow.com/questions/111529/how-to-create-query-parameters-in-javascript
+          
+          const ret = [];
+          for (let d in data)
+            ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
+          return ret.join('&');
+        }
+  
+        const displayRecipies = (dataString)=>{
+          console.log("Parsing Recipies");
+          let content = document.body.querySelector('#content')
+          let data = JSON.parse(dataString).results
+          let u = 0;
+          
+          data.forEach(json => {
+            let recipeElement = document.createElement('recipe')
+            let recipe = {
+              name: json.name,
+              description: json.description,
+              country: json.country,
+              language: json.language,
+              prepTimeMinutes: json.prep_time_minutes,
+              cookTimeMinutes: json.cook_time_minutes,
+              totalTimeMinutes: json.total_time_minutes,
+              timeTier: json.total_time_tier,
+              num_servings: json.num_servings,
+              video: json.original_video_url,
+              instructions: json.instructions,
+              nutrition: json.nutrition,
+              tags: json.tags,
+              feed: json.recirc_feeds,
+              credits: json.credits,
+              thumbnail: json.thumbnail_url,
+              topics: json.topics,
+              rating: json.user_ratings
+            }
+            localStorage.setItem("recipe", JSON.stringify(recipe))
+                      
+            recipeElement.innerHTML = 
+            `<img id="thumb" src=${recipe.thumbnail}> </img>
+              <a href="javascript:void(0)" recipe="${recipe.name}" onclick="loadRecipe(this)">${recipe.name}</a>`
+            let element = recipeElement.outerHTML
+            content.append(recipeElement)
+            u++;
+          });
+          
+        }
+  
+        const getRecipe = () => {
+          // remember that an `Event` object gets passed along every time that an event handler or listener calls a function
+          // the `target` property of that event points at the element that sent the event, in this case a button
+          //console.log(`An element of id=${e.target.id} was clicked!`);
+          let params = (new URL(document.location)).searchParams;
+          let food = params.get("food");
+          let tag = params.get("tag");
+          //console.log(food);
+          const foodURL = `/recipe-json?food=${food}&tag=${tag}`;
+          const xhr = new XMLHttpRequest();
+          xhr.onload = handleRecipies
+          xhr.open("GET", foodURL);
+          xhr.setRequestHeader('Accept', "application/javascript");
+          xhr.send();
+        }
+  
+        const init = () => {
+          console.log("Project 1 Init");
+          let location = window.location
+          const urlSearchParams = new URLSearchParams(window.location.search);
+          const params = Object.fromEntries(urlSearchParams.entries());
+          let params = (new URL(window.location)).searchParams;
+          console.log(location);
+         /* console.log(url,acceptedType);
+          const xhr = new XMLHttpRequest();
+          
+          xhr.open(method, url);
+          xhr.setRequestHeader('Accept', acceptedType);
+          
+          xhr.onload = () => handleRecipies(xhr);
+      
+          xhr.send();*/
+          
+        }
+  
+        
+        
+  
+        const getRecipes = (food, tag)=>{
+          const data = null;
+          const xhr = new XMLHttpRequest();
+          xhr.withCredentials = false;
+  
+          xhr.addEventListener("readystatechange", function () {
+            if (this.readyState === this.DONE) {
+              console.log(this.responseText);
+              localStorage.setItem("recipies", this.responseText)
+            }
+          });
+  
+          xhr.open("GET", "https://tasty.p.rapidapi.com/recipes/list?from=0&size=20&tags="+tag+"&q="+food);
+          xhr.setRequestHeader("x-rapidapi-host", "tasty.p.rapidapi.com");
+          xhr.setRequestHeader("x-rapidapi-key", "170e038a70mshc48a677384b7b29p120f51jsn123cfd31d18c");
+  
+          xhr.send(data);
+        }
+        const getSessionStorage=(key, callback)=>{
+          let data = undefined
+          let time = setInterval(function (){
+              data = sessionStorage.getItem(key) 
+              
+              if(data != "" && data != null){
+                
+                callback(data)
+                clearInterval(time)
+                  
+              }
+          }, 200);
+  
+        }
+        const getStorage=(key, callback)=>{
+          let data = undefined
+          let time = setInterval(function (){
+              data = localStorage.getItem(key) 
+              
+              if(data != "" && data != null){
+                data = callback(data)
+                clearInterval(time)
+                //data = callback(data)
+                //return data
+                //console.log(data);  
+              }
+             // return data
+          }, 200); 
+          //console.log(time);  
+        }
+  
+        
+
+        
+        window.onload = init;
+       
+      </script>
+</body>
+</html>

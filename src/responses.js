@@ -1,5 +1,9 @@
+const { log } = require('console');
 const http = require('https');
+let query = require('querystring');
 
+let userSearchParameters = []
+let searchIdx = -1;
 const jokes = [
 
   {
@@ -111,6 +115,7 @@ const getRandomJokesMeta = (request, response, params, acceptedTypes, httpMethod
 
 const getRandomJokesJSON = (request, response, params, acceptedTypes, httpMethod) => {
   const { limit } = params.query;
+  //console.log(params);
   const randomJokes = getRandomJoke(limit);
   if (acceptedTypes.includes('text/xml')) {
     const xmlContent = getJokesXML(randomJokes);
@@ -121,42 +126,135 @@ const getRandomJokesJSON = (request, response, params, acceptedTypes, httpMethod
 };
 
 const getRecipesJSON = (request, response, params, acceptedTypes, httpMethod) => {
-  const { query } = params;
-  const options = {
-    method: 'GET',
-    hostname: 'tasty.p.rapidapi.com',
-    port: null,
-    path: `/recipes/list?from=0&size=20&tags=${query.tag}&q=${query.food}`,
-    headers: {
-      'x-rapidapi-host': 'tasty.p.rapidapi.com',
-      'x-rapidapi-key': '170e038a70mshc48a677384b7b29p120f51jsn123cfd31d18c',
-      useQueryString: true,
-    },
-  };
+  console.log("Get Recipe");
+  //console.log(userSearchParameters);
+  if(userSearchParameters.length==0){
+    postRecipesJSON(request, response, params, acceptedTypes, httpMethod)
+  }
+  else{
+    respond(request, response, JSON.stringify(userSearchParameters), 'application/json');
+  }
+ };
 
-  const req = http.request(options, (res) => {
-    const chunks = [];
 
-    res.on('data', (chunk) => {
-      chunks.push(chunk);
-    });
 
-    res.on('end', () => {
-      const body = JSON.parse(Buffer.concat(chunks).toString());
-
-      // console.log(body);
-      respond(request, response, JSON.stringify(body), 'application/json');
-    });
-  });
-
-  req.end();
+const postRecipesJSON = (request, response, params, acceptedTypes, httpMethod) => {
+ 
+  let { food, tag, click} = params.query;
+  if(click != undefined){
+    console.log("POSTING");
+    if(food == undefined || tag == undefined){
+      //food="ok"
+      console.log(userSearchParameters);
+      respond(request, response, JSON.stringify(userSearchParameters), 'application/json');
+      return
+    }
+    else{
+      const options = {
+        method: 'GET',
+        hostname: 'tasty.p.rapidapi.com',
+        port: null,
+        path: `/recipes/list?from=0&size=20&tags=${tag}&q=${food}`,
+        headers: {
+          'x-rapidapi-host': 'tasty.p.rapidapi.com',
+          'x-rapidapi-key': '170e038a70mshc48a677384b7b29p120f51jsn123cfd31d18c',
+          useQueryString: true,
+        },
+      };
+    
+      const req = http.request(options, (res) => {
+        const chunks = [];
+    
+        res.on('data', (chunk) => {
+          chunks.push(chunk);
+        });
+    
+        res.on('end', () => {
+          const body = JSON.parse(Buffer.concat(chunks).toString());
+          let results = []
+          //console.log(body);
+          body.results.forEach(json => {
+            
+            let recipeObj = {
+              name: json.name,
+              description: json.description,
+              country: json.country,
+              language: json.language,
+              prepTimeMinutes: json.prep_time_minutes,
+              cookTimeMinutes: json.cook_time_minutes,
+              totalTimeMinutes: json.total_time_minutes,
+              timeTier: JSON.stringify(json.total_time_tier),
+              num_servings: json.num_servings,
+              video: json.original_video_url,
+              instructions: JSON.stringify(json.instructions),
+              nutrition: JSON.stringify(json.nutrition),
+              tags: JSON.stringify(json.tags),
+              feed: JSON.stringify(json.recirc_feeds),
+              credits: JSON.stringify(json.credits),
+              thumbnail: json.thumbnail_url,
+              topics: JSON.stringify(json.topics),
+              rating: JSON.stringify(json.user_ratings)
+            }
+            results.push(recipeObj)
+            
+          });
+          //console.log(arr);
+          //console.log(body);
+          userSearchParameters.push({
+            searchedAt:new Date(),
+            food:food,
+            tag:tag,
+            results:results
+          })
+          
+          let idx = 0; 
+          for (let i = 0; i < userSearchParameters.length; i++) {
+            const recipeObj = userSearchParameters[i];
+            if(recipeObj.food == food && recipeObj.tag == tag){
+              idx = i
+            }
+            
+          }
+          //console.log(userSearchParameters[idx]);
+          respond(request, response, JSON.stringify(userSearchParameters), 'application/json');
+          /*
+          if(userSearchParameters[idx].food == food && userSearchParameters[idx].tag == tag){
+            console.log("Write idx");
+            respond(request, response, JSON.stringify(userSearchParameters[idx]), 'application/json');
+          }
+          else{
+            console.log("Write");
+            respond(request, response, JSON.stringify(userSearchParameters), 'application/json');
+          }*/
+          //searchParameters[searchIdx].results = body.results
+          //console.log(searchParameters[searchIdx]);
+          
+        });
+      });
+    
+      req.end();
+      return
+    }
+  }
+  else{
+    console.log(userSearchParameters);
+    respond(request, response, JSON.stringify(userSearchParameters), 'application/json');
+  }
+  //console.log(click);
+  
   
 };
+
+
+
+
 
 module.exports = {
   getRandomJokesJSON,
   getRandomJokesMeta,
   notFound,
   getRecipesJSON,
+  postRecipesJSON
+  
 
 };

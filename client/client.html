@@ -6,10 +6,10 @@
   <body>
     <h1>CLIENT PAGE</h1>
     <p>
-      Random Joke Web Service - the endpoint is here --> 
-      <a href="/random-joke">random-joke</a> or <a href="/random-jokes?limit=10">random-jokes?limit=10</a>
+      See all endpoints 
+      <a href="/recipes-json">Recipes JSON</a> or <a href="/recipes-client">Recipe Client</a>
     </p>
-    <form id="searchform" method="POST">
+    <form id="searchform" method="POST" action="/recipes-json">
       <div>
         <label for="food">Food Name or Ingredient</label><br>
         <input type="text" id="food" name="food" value="Chicken"><br>
@@ -23,13 +23,13 @@
         </datalist>
       </div>
     </form> 
-    <input id="submitbtn" type="submit" form="searchform"></input>
+    <input id="submitbtn" type="submit"></input>
     <script>
     
 
-      const init = () => {
-        localStorage.clear()
-
+      const init = () => {//form="searchform"
+        
+        //getTags()
         console.log("Project 1 Init");
         getTags()
         let recipeTags = document.body.querySelector('#recipeTags')
@@ -40,6 +40,7 @@
         recipeTagInput.value = ""
         let searchform = document.body.querySelector('#searchform')
         getStorage("tagsList",(data)=>{
+          
           let tags = JSON.parse(data).results
           tags.forEach(tag => {
           //console.log(tag);
@@ -56,19 +57,57 @@
           recipeTags.append(option)
         
         });
-          
-        searchform.onsubmit = (f)=>{
-          console.log(recipeTagInput.value);
-          let tag = recipeTagInput.value
+
+        let button = document.body.querySelector('#submitbtn')
+        button.onclick=(e)=>{
+          //e.preventDefault()
+          console.log("FORMBTTN");
+           
           let food = searchFood.value
-          let route = `/recipe?food=${food}&tag=${tag}`
-          searchform.action = route
-          //console.log(tag);
+          let tag = recipeTagInput.value
+          const formAction = searchform.getAttribute("action");
+          const formMethod = searchform.getAttribute("method");
+          let data = `food=${food}&tag=${tag}` //`/recipes-client?food=${food}&tag=${tag}`
+          //searchform.action = `/recipes-json?${data}`
+          sendAjax(e, searchform, food, tag)
+          //downloadRecipes(food, tag)
+          setTimeout(() => {
+            location.href=`/recipes-client?food=${food}&tag=${tag}`
+          }, 1000);
+          
+         //searchform.submit()
+          //searchform.action = `/recipes-json?${data}`
+          
         }
+
+      
 
       })
 
       }
+
+      const sendAjax = (e, searchform, food, tag)=>{
+        e.preventDefault();
+        console.log("SUBMIT");
+        const formAction = searchform.getAttribute("action");
+        const formMethod = searchform.getAttribute("method");
+        let data = `${formAction}?food=${food}&tag=${tag}&click=${true}` //`/recipes-client?food=${food}&tag=${tag}`
+        //searchform.setAttribute("action", data)
+        
+        const xhr = new XMLHttpRequest();
+        xhr.open(formMethod,data); // NEW - in the past we've been using "GET"
+        
+        xhr.setRequestHeader('Accept','application/json');
+        xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+        // xhr.onload = () => handleResponse(xhr);
+        xhr.send(data);
+        
+        return true;
+      }
+
+      
+
+     
       
 
       const getRecipes = (food, tag)=>{
@@ -123,6 +162,8 @@
       
 
       const getTags = ()=>{
+        sessionStorage.clear()
+        //localStorage.setItem("results", "")
         const data = null;
         const xhr = new XMLHttpRequest();
         //xhr.withCredentials = true;

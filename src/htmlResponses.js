@@ -5,6 +5,7 @@ const indexPage = fs.readFileSync(`${__dirname}/../client/client.html`);
 const jokeClient = fs.readFileSync(`${__dirname}/../client/joke-client.html`);
 const defaultCSS = fs.readFileSync(`${__dirname}/../client/default-styles.css`);
 
+const recipeHTML = fs.readFileSync(`${__dirname}/../client/recipe.html`);
 const recipeClient = fs.readFileSync(`${__dirname}/../client/recipe-client.html`);
 
 const getDefaultCSS = (request, response) => {
@@ -31,6 +32,12 @@ const getRecipeClient = (request, response) => {
   response.end();
 };
 
+const getRecipeHTML = (request, response) => {
+  response.writeHead(200, { 'Content-Type': 'text/html' });
+  response.write(recipeHTML);
+  response.end();
+};
+
 const getJokeClient = (request, response) => {
   response.writeHead(200, { 'Content-Type': 'text/html' });
   response.write(jokeClient);
@@ -43,4 +50,5 @@ module.exports = {
   getDefaultCSS,
   getJokeClient,
   getRecipeClient,
+  getRecipeHTML
 };

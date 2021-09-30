@@ -2,6 +2,7 @@
 // https://github.com/tonethar/IGME-430-Fall-2021/blob/main/hw-notes/HW-random-jokes-plus.md#phase2
 const http = require('http');
 const url = require('url');
+const query = require('querystring');
 const htmlHandler = require('./htmlResponses');
 const responseHandler = require('./responses');
 
@@ -21,11 +22,14 @@ const urlStruct = {
     '/random-joke': responseHandler.getRandomJokesJSON,
     '/random-jokes': responseHandler.getRandomJokesJSON,
     '/default-styles.css': htmlHandler.getDefaultCSS,
-    '/recipe-json':responseHandler.getRecipesJSON,
+    
+    '/recipes-json':responseHandler.getRecipesJSON,
+    '/recipes-client': htmlHandler.getRecipeClient,
+    '/recipe': htmlHandler.getRecipeHTML,
     notFound: htmlHandler.get404Response,
   },
   POST:{
-    '/recipe': htmlHandler.getRecipeClient,
+    '/recipes-json': responseHandler.postRecipesJSON,
   },
   HEAD: {
     '/random-joke': responseHandler.getRandomJokesMeta,
@@ -38,6 +42,8 @@ const urlStruct = {
 // this time we will look at the `pathname`, and send back the appropriate page
 // note that in this course we'll be using arrow functions 100% of the time in our server-side code
 
+
+
 const onRequest = (request, response) => {
   // console.log(request.headers);
   const path = request.url;// request.url
@@ -48,6 +54,7 @@ const onRequest = (request, response) => {
   // console.log(path, pathname);
   // console.log(request.headers);
   const httpMethod = request.method;
+  console.log(httpMethod, pathname);
   //console.log(httpMethod);
   if (urlStruct[httpMethod][pathname]) {
     //console.log(params.query);

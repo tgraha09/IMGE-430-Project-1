@@ -6,11 +6,13 @@
 }
 
 #thumb{
-    max-width: 400px;
-    max-height: 300px;
+    position: relative;
+    display: block;
+    max-width: 200px;
+
 }
 recipe{
     display: inline-block;
     border-style: dotted;
-    max-width: 600px;
+    max-width: 200px;
 }

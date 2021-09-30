@@ -18,89 +18,124 @@
         xhr.open(method, url);
         xhr.setRequestHeader('Accept', acceptedType);
         
-        xhr.onload = () => handleRecipies(xhr);
+        xhr.onload = () => storeRecipies(xhr);
     
         xhr.send();
         
       };
 
-      const handleRecipies = (e) =>{
-          //console.log("e.target", e.target);
-          //console.log("e.target.response = ", e.target.response);
-          //const results = JSON.parse(e.target.response).results
-          localStorage.setItem("results", e.target.response)
-          
-          //displayRecipies(e.target.response)
-          /*let container = document.querySelector('#jokeContainer')
-          
-          obj.forEach(joke => {
-              container.innerHTML += `<section><h3>${joke.q}</h3>
-                                  <h3>${joke.a}</h3></section>`
-          });*/
+      const storeRecipies = (e, food, tag) =>{
+        let userSearch = JSON.parse(e.target.response)
+        if(userSearch== undefined){
+          console.log("UNDEFINED");
+        }
+        console.log(userSearch);
+
+        
+        //localStorage.setItem("results", JSON.stringify(e.target.responseText))
+        
+        console.log(userSearch);
+        let idx = 0;
+        for (let i = 0; i < userSearch.length; i++) {
+          const search = userSearch[i];
+          let userFood = search.food
+          let userTag = search.tag
+          //console.log(userFood, userTag);
+          if(food == userFood && tag == userTag){
+            idx = i
+            // localStorage.setItem("results", JSON.stringify(userSearch))
+              
+          }
+        }
+        displayRecipies(userSearch[idx])
+        //console.log(userSearch[idx]);
+        //sessionStorage.setItem("results", JSON.stringify(userSearch[idx]))
+       
       }
 
       const downloadRecipes = () => {
+        console.log("Downloading Recipes");
         // remember that an `Event` object gets passed along every time that an event handler or listener calls a function
         // the `target` property of that event points at the element that sent the event, in this case a button
         //console.log(`An element of id=${e.target.id} was clicked!`);
         let params = (new URL(document.location)).searchParams;
         let food = params.get("food");
         let tag = params.get("tag");
-        //console.log(food);
-        const foodURL = `/recipe-json?food=${food}&tag=${tag}`;
+        
+        const recipeURL = `/recipes-json`;
         const xhr = new XMLHttpRequest();
-        xhr.onload = handleRecipies
-        xhr.open("GET", foodURL);
+        
+        xhr.onload = (e)=> storeRecipies(e, food, tag)
+        
+        
+        xhr.open("GET", recipeURL);
         xhr.setRequestHeader('Accept', "application/javascript");
         xhr.send();
+      }
+      
+      //Function found from stack overflow from user "Gibolt"
+      function encodeQueryData(data) {
+        //https://stackoverflow.com/questions/111529/how-to-create-query-parameters-in-javascript
+        
+        const ret = [];
+        for (let d in data)
+          ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
+        return ret.join('&');
       }
 
       const displayRecipies = (dataString)=>{
         console.log("Parsing Recipies");
         let content = document.body.querySelector('#content')
-        let data = JSON.parse(dataString).results
-        data.forEach(json => {
-          let recipe = {
-            name: json.name,
-            description: json.description,
-            country: json.country,
-            language: json.language,
-            prepTimeMinutes: json.prep_time_minutes,
-            cookTimeMinutes: json.cook_time_minutes,
-            totalTimeMinutes: json.total_time_minutes,
-            timeTier: json.total_time_tier,
-            num_servings: json.num_servings,
-            video: json.original_video_url,
-            instructions: json.instructions,
-            nutrition: json.nutrition,
-            tags: json.tags,
-            feed: json.recirc_feeds,
-            credits: json.credits,
-            thumbnail: json.thumbnail_url,
-            topics: json.topics,
-            rating: json.user_ratings
-          }
-          let element = 
-          `<recipe> 
-            <img id="thumb" src=${recipe.thumbnail}> </img>
-            <h2>${recipe.name}</h2>
-              <p>${recipe.description}</p>
-              
-            </recipe>`
-            content.innerHTML += element
+        let data = dataString.results
+        //console.log(dataString.results);
+        //console.log(dataString);
+        let u = 0;
+        //sessionStorage.setItem("results", "")
+        data.forEach(recipe => {
           console.log(recipe);
+          let recipeElement = document.createElement('recipe')
+          
+          
+          let params = encodeQueryData(recipe).toString()
+          if(u == 0){
+            //console.log(params);
+          }
+          sessionStorage.setItem("recipe", JSON.stringify(recipe))
+                    
+          recipeElement.innerHTML = 
+          `<img id="thumb" src=${recipe.thumbnail}> </img>
+            <a href="javascript:void(0)" recipe="${params}" onclick="loadRecipe(this)">${recipe.name}</a>`
+          let element = recipeElement.outerHTML
+          content.append(recipeElement)
+          u++;
         });
+        
+        //localStorage.setItem("results", "")
+      }
+
+      let loadRecipe = (element)=>{
+        let recipeName = element.getAttribute('recipe')
+        let params = (new URL(document.location)).searchParams;
+        let recipePath = `/recipe?food=${params.get("food")}&tag=${params.get("tag")}?` + recipeName
+        //console.log(recipePath);
+        window.location = recipePath
+            //console.log(element.getAttribute('path'));
       }
 
       const init = () => {
+        //localStorage.setItem("results", "")
         console.log("Project 1 Init");
         downloadRecipes()
         
-        getStorage("results", (dataString)=>{
+        getSessionStorage("results", (dataString)=>{
+          //console.log(dataString);
           displayRecipies(dataString)
+          //localStorage.setItem("results", "")
         })
         
       }
+
+      
       
 
       const getRecipes = (food, tag)=>{
@@ -127,7 +162,7 @@
             data = sessionStorage.getItem(key) 
             
             if(data != "" && data != null){
-                
+              
               callback(data)
               clearInterval(time)
                 
@@ -152,27 +187,6 @@
         //console.log(time);  
       }
 
-      
-
-      const getTags = ()=>{
-        const data = null;
-        const xhr = new XMLHttpRequest();
-        //xhr.withCredentials = true;
-        xhr.withCredentials = false
-
-        xhr.addEventListener("readystatechange", function () {
-          if (this.readyState === this.DONE) {
-            localStorage.setItem("tagsList", this.responseText)
-            //console.log(this.responseText);
-          }
-        });
-
-        xhr.open("GET", "https://tasty.p.rapidapi.com/tags/list");
-        xhr.setRequestHeader("x-rapidapi-host", "tasty.p.rapidapi.com");
-        xhr.setRequestHeader("x-rapidapi-key", "170e038a70mshc48a677384b7b29p120f51jsn123cfd31d18c");
-        
-        xhr.send(data);
-      }
       
       window.onload = init;
      
