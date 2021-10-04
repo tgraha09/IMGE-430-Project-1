@@ -5,6 +5,10 @@
   </head>
   <body>
     <h1>RECIPE PAGE</h1>
+    <p>
+      See all endpoints 
+      <a href="/recipes-json">Recipes JSON</a> or <a href="/recipes-client">Recipe Client</a>
+    </p>
     <div id="content"></div>
     
     <script>
@@ -29,7 +33,7 @@
         if(userSearch== undefined){
           console.log("UNDEFINED");
         }
-        console.log(userSearch);
+        //console.log(userSearch);
 
         
         //localStorage.setItem("results", JSON.stringify(e.target.responseText))
@@ -86,12 +90,12 @@
       const displayRecipies = (dataString)=>{
         console.log("Parsing Recipies");
         let content = document.body.querySelector('#content')
-        let data = dataString.results
+        let data = dataString //.results
         //console.log(dataString.results);
-        //console.log(dataString);
+        console.log(data);
         let u = 0;
         //sessionStorage.setItem("results", "")
-        data.forEach(recipe => {
+        data.results.forEach(recipe => {
           console.log(recipe);
           let recipeElement = document.createElement('recipe')
           
@@ -100,11 +104,11 @@
           if(u == 0){
             //console.log(params);
           }
-          sessionStorage.setItem("recipe", JSON.stringify(recipe))
+         // sessionStorage.setItem("recipe", JSON.stringify(recipe))
                     
           recipeElement.innerHTML = 
           `<img id="thumb" src=${recipe.thumbnail}> </img>
-            <a href="javascript:void(0)" recipe="${params}" onclick="loadRecipe(this)">${recipe.name}</a>`
+            <a href="javascript:void(0)" recipe="${recipe.id}" onclick="loadRecipe(this)">${recipe.name}</a>`
           let element = recipeElement.outerHTML
           content.append(recipeElement)
           u++;
@@ -114,9 +118,9 @@
       }
 
       let loadRecipe = (element)=>{
-        let recipeName = element.getAttribute('recipe')
+        let recipeid = element.getAttribute('recipe')
         let params = (new URL(document.location)).searchParams;
-        let recipePath = `/recipe?food=${params.get("food")}&tag=${params.get("tag")}?` + recipeName
+        let recipePath = `/recipe?food=${params.get("food")}&tag=${params.get("tag")}&id=${recipeid}`
         //console.log(recipePath);
         window.location = recipePath
             //console.log(element.getAttribute('path'));
@@ -129,7 +133,7 @@
         
         getSessionStorage("results", (dataString)=>{
           //console.log(dataString);
-          displayRecipies(dataString)
+          //displayRecipies(dataString)
           //localStorage.setItem("results", "")
         })
         

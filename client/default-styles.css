@@ -16,3 +16,11 @@ recipe{
     border-style: dotted;
     max-width: 200px;
 }
+
+#recipeImg{
+    max-width: 400px;
+}
+
+#details{
+    max-width: 600px;
+}

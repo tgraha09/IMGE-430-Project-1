@@ -28,7 +28,7 @@
     
 
       const init = () => {//form="searchform"
-        
+        sessionStorage.clear()
         //getTags()
         console.log("Project 1 Init");
         getTags()
@@ -73,7 +73,7 @@
           //downloadRecipes(food, tag)
           setTimeout(() => {
             location.href=`/recipes-client?food=${food}&tag=${tag}`
-          }, 1000);
+          }, 1500);
           
          //searchform.submit()
           //searchform.action = `/recipes-json?${data}`

@@ -156,28 +156,18 @@ const postRecipesJSON = (request, response, params, acceptedTypes, httpMethod) =
         res.on('end', () => {
           const body = JSON.parse(Buffer.concat(chunks).toString());
           const results = [];
-          // console.log(body);
+          // console.log(body); 
           body.results.forEach((json) => {
+            //console.log(json);
             const recipeObj = {
               name: json.name,
-              description: json.description,
-              country: json.country,
-              language: json.language,
-              prepTimeMinutes: json.prep_time_minutes,
-              cookTimeMinutes: json.cook_time_minutes,
-              totalTimeMinutes: json.total_time_minutes,
-              timeTier: JSON.stringify(json.total_time_tier),
-              num_servings: json.num_servings,
-              video: json.original_video_url,
-              instructions: JSON.stringify(json.instructions),
-              nutrition: JSON.stringify(json.nutrition),
-              tags: JSON.stringify(json.tags),
-              feed: JSON.stringify(json.recirc_feeds),
-              credits: JSON.stringify(json.credits),
+              id: json.id,
+              searchIndex: json.position,
+              
               thumbnail: json.thumbnail_url,
-              topics: JSON.stringify(json.topics),
-              rating: JSON.stringify(json.user_ratings),
+              
             };
+            /**/
             results.push(recipeObj);
           });
           // console.log(arr);
