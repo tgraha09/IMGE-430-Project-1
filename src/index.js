@@ -29,7 +29,7 @@ const urlStruct = {
     '/recipes-json': responseHandler.postRecipesJSON,
   },
   HEAD: {
-   
+
     '/recipes-json': responseHandler.getRecipesMeta,
     notFound: responseHandler.notFound,
   },
@@ -50,7 +50,7 @@ const onRequest = (request, response) => {
   // console.log(request.headers);
   const httpMethod = request.method;
   console.log(httpMethod, pathname);
-  //console.log(params)
+  // console.log(params)
   // console.log(httpMethod);
   if (urlStruct[httpMethod][pathname]) {
     // console.log(params.query);

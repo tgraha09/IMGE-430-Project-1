@@ -5,7 +5,6 @@ const query = require('querystring');
 const userSearchParameters = [];
 const searchIdx = -1;
 
-
 const notFound = (request, response) => {
   const responseJSON = {
     message: 'The page you are looking for was not found!',
@@ -16,15 +15,11 @@ const notFound = (request, response) => {
   response.end();
 };
 
-
-
-const respond = (request, response,status, content, type) => {
+const respond = (request, response, status, content, type) => {
   response.writeHead(status, { 'Content-Type': type });
   response.write(content);
   response.end();
-  
 };
-
 
 const respondMeta = (request, response, status, content, type) => {
   const getBinarySize = (string) => Buffer.byteLength(string, 'utf8');
@@ -37,12 +32,22 @@ const respondMeta = (request, response, status, content, type) => {
   response.writeHead(status, headers);
   response.end();
 };
+const buildXML = (data) => {
+  console.log('Building Recipes');
 
+  const u = 0;
+  let content = '';
 
+  data.results.forEach((recipe) => {
+    const recipeElement = `<recipe><img id="thumb" src=${recipe.thumbnail}> </img>
+    <a href="javascript:void(0)" recipe="${recipe.id}" onclick="loadRecipe(this)">${recipe.name}</a></recipe>`;
+    content += recipeElement;
+  });
 
-
+  return content;
+};
 const getRecipeXML = (request, response, params, acceptedTypes, httpMethod) => {
-  const { food, tag} = params.query;
+  const { food, tag } = params.query;
   let idx = 0;
   for (let i = 0; i < userSearchParameters.length; i += 1) {
     const recipeObj = userSearchParameters[i];
@@ -52,41 +57,20 @@ const getRecipeXML = (request, response, params, acceptedTypes, httpMethod) => {
   }
 
   // console.log(params);
-  let content = buildXML(userSearchParameters[idx])
+  const content = buildXML(userSearchParameters[idx]);
   console.log(content);
-  console.log(acceptedTypes)
-  respond(request, response,200, content, 'text/xml');
+  console.log(acceptedTypes);
+  respond(request, response, 200, content, 'text/xml');
 };
 
-
-
-const buildXML = (data)=>{
-  console.log("Building Recipes");
-  
-  let u = 0;
-  let content = ``
-
-  data.results.forEach(recipe => {
-  
-   let recipeElement = 
-    `<recipe><img id="thumb" src=${recipe.thumbnail}> </img>
-    <a href="javascript:void(0)" recipe="${recipe.id}" onclick="loadRecipe(this)">${recipe.name}</a></recipe>`
-    content+=recipeElement
-  
-  });
-  
-  return content
-
-}
 const postRecipesJSON = (request, response, params, acceptedTypes, httpMethod) => {
   const { food, tag, click } = params.query;
-  //console.log(acceptedTypes)
+  // console.log(acceptedTypes)
   if (food === undefined || tag === undefined) {
     // food="ok"
-    //console.log(userSearchParameters);
+    // console.log(userSearchParameters);
     respond(request, response, 400, JSON.stringify(userSearchParameters), acceptedTypes);
-  } 
-  else {
+  } else {
     console.log('POSTING');
     const options = {
       method: 'GET',
@@ -110,15 +94,15 @@ const postRecipesJSON = (request, response, params, acceptedTypes, httpMethod) =
       res.on('end', () => {
         const body = JSON.parse(Buffer.concat(chunks).toString());
         const results = [];
-        // console.log(body); 
+        // console.log(body);
         body.results.forEach((json) => {
-          //console.log(json);
+          // console.log(json);
           const recipeObj = {
             name: json.name,
             id: json.id,
             searchIndex: json.position,
             thumbnail: json.thumbnail_url,
-            
+
           };
           /**/
           results.push(recipeObj);
@@ -132,100 +116,89 @@ const postRecipesJSON = (request, response, params, acceptedTypes, httpMethod) =
           results,
         });
 
-        let recipe
+        let recipe;
         for (let i = 0; i < userSearchParameters.length; i += 1) {
           const recipeObj = userSearchParameters[i];
           if (recipeObj.food === food && recipeObj.tag === tag) {
-            recipe = recipeObj
+            recipe = recipeObj;
           }
         }
-        if(acceptedTypes.includes("text/xml")){
-          
-          let content = buildXML(recipe)
-          respondMeta(request, response, 201, content, "text/xml");
-        }
-        else{
-          //console.log(recipe)
-          respondMeta(request, response, 201, JSON.stringify(recipe), "application/json");
+        if (acceptedTypes.includes('text/xml')) {
+          const content = buildXML(recipe);
+          respondMeta(request, response, 201, content, 'text/xml');
+        } else {
+          // console.log(recipe)
+          respondMeta(request, response, 201, JSON.stringify(recipe), 'application/json');
         }
       });
     });
 
     req.end();
   }
-  
 };
 
-const getRecipesMeta= (request, response, params, acceptedTypes, httpMethod) =>{
-  const { food, tag} = params.query;
-  
+const getRecipesMeta = (request, response, params, acceptedTypes, httpMethod) => {
+  const { food, tag } = params.query;
+
   console.log(acceptedTypes);
   if (userSearchParameters.length === 0) {
     console.log('Failed Get');
     postRecipesJSON(request, response, params, acceptedTypes, httpMethod);
-    //respond(request, response, userSearchParameters, 'application/json');
+    // respond(request, response, userSearchParameters, 'application/json');
   } else {
-
-    let recipe
+    let recipe;
     for (let i = 0; i < userSearchParameters.length; i += 1) {
       const recipeObj = userSearchParameters[i];
       if (recipeObj.food === food && recipeObj.tag === tag) {
-        recipe = recipeObj
+        recipe = recipeObj;
       }
     }
-    if(acceptedTypes.includes("text/xml")){
-      
-      let content = buildXML(recipe)
-      respondMeta(request, response, 200, content, "text/xml");
-    }
-    else{
-      //console.log(recipe)
-      respondMeta(request, response, 200, JSON.stringify(recipe), "application/json");
+    if (acceptedTypes.includes('text/xml')) {
+      const content = buildXML(recipe);
+      respondMeta(request, response, 200, content, 'text/xml');
+    } else {
+      // console.log(recipe)
+      respondMeta(request, response, 200, JSON.stringify(recipe), 'application/json');
     }
   }
-}
+};
 
-const getRecipes= (request, response, params, acceptedTypes, httpMethod) => {
-  const { food, tag} = params.query;
-  
+const getRecipes = (request, response, params, acceptedTypes, httpMethod) => {
+  const { food, tag } = params.query;
+
   console.log(acceptedTypes);
   if (userSearchParameters.length === 0) {
     console.log('Failed Get');
     postRecipesJSON(request, response, params, acceptedTypes, httpMethod);
-    //respond(request, response, userSearchParameters, 'application/json');
+    // respond(request, response, userSearchParameters, 'application/json');
   } else {
-
-    let recipe
+    let recipe;
     for (let i = 0; i < userSearchParameters.length; i += 1) {
       const recipeObj = userSearchParameters[i];
       if (recipeObj.food === food && recipeObj.tag === tag) {
-        recipe = recipeObj
+        recipe = recipeObj;
       }
     }
-    if(recipe != undefined){
-      if(acceptedTypes.includes("text/xml")){
-      
-        let content = buildXML(recipe)
-        respond(request, response, 200, content, "text/xml");
+    if (recipe !== undefined) {
+      if (acceptedTypes.includes('text/xml')) {
+        const content = buildXML(recipe);
+        respond(request, response, 200, content, 'text/xml');
+      } else {
+        // console.log(recipe)
+        respond(request, response, 200, JSON.stringify(recipe), 'application/json');
       }
-      else{
-        //console.log(recipe)
-        respond(request, response,200, JSON.stringify(recipe), "application/json");
-      }
+    } else {
+      // console.log("No Recipes Found")
+      // console.log(userSearchParameters)
+      respond(request, response, 200, JSON.stringify(userSearchParameters), 'application/json');
+      // notFound(request, response)
     }
-    else{
-     // console.log("No Recipes Found")
-      //console.log(userSearchParameters)
-      respond(request, response,200, JSON.stringify(userSearchParameters), "application/json");
-      //notFound(request, response)
-    }
-    
   }
 };
 
-module.exports = {  
+module.exports = {
   notFound,
   getRecipes,
   postRecipesJSON,
-  getRecipesMeta
+  getRecipesMeta,
 };
