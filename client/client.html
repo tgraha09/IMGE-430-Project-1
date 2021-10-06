@@ -19,7 +19,7 @@
         <label for="tag">Select Tag</label><br>
         <input class="tagInput" type="text" name="tag" list="recipeTags"/>
         <datalist  name="recipeTags" id="recipeTags">
-          <option id="tag" value=""></option>
+          <option id="tag" value="american"></option>
         </datalist>
       </div>
     </form> 
@@ -31,7 +31,7 @@
         sessionStorage.clear()
         //getTags()
         console.log("Project 1 Init");
-        //getTags()
+        getTags()
         let recipeTags = document.body.querySelector('#recipeTags')
         let recipeTagInput = document.body.querySelector('.tagInput')
         recipeTagInput.recipeTags = []
