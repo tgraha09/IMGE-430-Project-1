@@ -31,7 +31,7 @@
         sessionStorage.clear()
         //getTags()
         console.log("Project 1 Init");
-        getTags()
+        //getTags()
         let recipeTags = document.body.querySelector('#recipeTags')
         let recipeTagInput = document.body.querySelector('.tagInput')
         recipeTagInput.recipeTags = []
@@ -61,7 +61,7 @@
         let button = document.body.querySelector('#submitbtn')
         button.onclick=(e)=>{
           //e.preventDefault()
-          console.log("FORMBTTN");
+          console.log("FORM BUTTON");
            
           let food = searchFood.value
           let tag = recipeTagInput.value
@@ -72,8 +72,9 @@
           sendAjax(e, searchform, food, tag)
           //downloadRecipes(food, tag)
           setTimeout(() => {
+            
             location.href=`/recipes-client?food=${food}&tag=${tag}`
-          }, 1500);
+          }, 2000);
           
          //searchform.submit()
           //searchform.action = `/recipes-json?${data}`
@@ -88,7 +89,7 @@
 
       const sendAjax = (e, searchform, food, tag)=>{
         e.preventDefault();
-        console.log("SUBMIT");
+        console.log("SENDING AJAX");
         const formAction = searchform.getAttribute("action");
         const formMethod = searchform.getAttribute("method");
         let data = `${formAction}?food=${food}&tag=${tag}&click=${true}` //`/recipes-client?food=${food}&tag=${tag}`
@@ -97,8 +98,6 @@
         const xhr = new XMLHttpRequest();
         xhr.open(formMethod,data); // NEW - in the past we've been using "GET"
         
-        xhr.setRequestHeader('Accept','application/json');
-        xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
         // xhr.onload = () => handleResponse(xhr);
         xhr.send(data);
         

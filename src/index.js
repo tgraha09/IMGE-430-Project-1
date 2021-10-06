@@ -18,12 +18,9 @@ const port = process.env.PORT || process.env.NODE_PORT || 3000;
 const urlStruct = {
   GET: {
     '/': htmlHandler.getIndexResponse,
-    '/joke-client.html': htmlHandler.getJokeClient,
-    '/random-joke': responseHandler.getRandomJokesJSON,
-    '/random-jokes': responseHandler.getRandomJokesJSON,
     '/default-styles.css': htmlHandler.getDefaultCSS,
 
-    '/recipes-json': responseHandler.getRecipesJSON,
+    '/recipes-json': responseHandler.getRecipes,
     '/recipes-client': htmlHandler.getRecipeClient,
     '/recipe': htmlHandler.getRecipeHTML,
     notFound: htmlHandler.get404Response,
@@ -32,8 +29,8 @@ const urlStruct = {
     '/recipes-json': responseHandler.postRecipesJSON,
   },
   HEAD: {
-    '/random-joke': responseHandler.getRandomJokesMeta,
-    '/random-jokes': responseHandler.getRandomJokesMeta,
+   
+    '/recipes-json': responseHandler.getRecipesMeta,
     notFound: responseHandler.notFound,
   },
 };
@@ -53,6 +50,7 @@ const onRequest = (request, response) => {
   // console.log(request.headers);
   const httpMethod = request.method;
   console.log(httpMethod, pathname);
+  //console.log(params)
   // console.log(httpMethod);
   if (urlStruct[httpMethod][pathname]) {
     // console.log(params.query);

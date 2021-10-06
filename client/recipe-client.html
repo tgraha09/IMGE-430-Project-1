@@ -15,30 +15,14 @@
 
       
 
-      const sendAjax = (url, method, acceptedType) => {
-        console.log(url,acceptedType);
-        const xhr = new XMLHttpRequest();
-        
-        xhr.open(method, url);
-        xhr.setRequestHeader('Accept', acceptedType);
-        
-        xhr.onload = () => storeRecipies(xhr);
-    
-        xhr.send();
-        
-      };
+      
 
-      const storeRecipies = (e, food, tag) =>{
+      const handleResponse = (e, food, tag) =>{
         let userSearch = JSON.parse(e.target.response)
         if(userSearch== undefined){
           console.log("UNDEFINED");
         }
         //console.log(userSearch);
-
-        
-        //localStorage.setItem("results", JSON.stringify(e.target.responseText))
-        
-        console.log(userSearch);
         let idx = 0;
         for (let i = 0; i < userSearch.length; i++) {
           const search = userSearch[i];
@@ -51,9 +35,9 @@
               
           }
         }
-        displayRecipies(userSearch[idx])
+        //displayRecipies(userSearch[idx])
         //console.log(userSearch[idx]);
-        //sessionStorage.setItem("results", JSON.stringify(userSearch[idx]))
+        sessionStorage.setItem("results", JSON.stringify(userSearch))
        
       }
 
@@ -66,10 +50,10 @@
         let food = params.get("food");
         let tag = params.get("tag");
         
-        const recipeURL = `/recipes-json`;
+        const recipeURL = `/recipes-json?food=${food}&tag=${tag}`;
         const xhr = new XMLHttpRequest();
         
-        xhr.onload = (e)=> storeRecipies(e, food, tag)
+        xhr.onload = (e)=> handleResponse(e, food, tag)
         
         
         xhr.open("GET", recipeURL);
@@ -77,16 +61,6 @@
         xhr.send();
       }
       
-      //Function found from stack overflow from user "Gibolt"
-      function encodeQueryData(data) {
-        //https://stackoverflow.com/questions/111529/how-to-create-query-parameters-in-javascript
-        
-        const ret = [];
-        for (let d in data)
-          ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
-        return ret.join('&');
-      }
-
       const displayRecipies = (dataString)=>{
         console.log("Parsing Recipies");
         let content = document.body.querySelector('#content')
@@ -99,8 +73,7 @@
           console.log(recipe);
           let recipeElement = document.createElement('recipe')
           
-          
-          let params = encodeQueryData(recipe).toString()
+      
           if(u == 0){
             //console.log(params);
           }
@@ -117,14 +90,7 @@
         //localStorage.setItem("results", "")
       }
 
-      let loadRecipe = (element)=>{
-        let recipeid = element.getAttribute('recipe')
-        let params = (new URL(document.location)).searchParams;
-        let recipePath = `/recipe?food=${params.get("food")}&tag=${params.get("tag")}&id=${recipeid}`
-        //console.log(recipePath);
-        window.location = recipePath
-            //console.log(element.getAttribute('path'));
-      }
+      
 
       const init = () => {
         //localStorage.setItem("results", "")
@@ -132,6 +98,8 @@
         downloadRecipes()
         
         getSessionStorage("results", (dataString)=>{
+          console.log(dataString);
+          displayRecipies(JSON.parse(dataString))
           //console.log(dataString);
           //displayRecipies(dataString)
           //localStorage.setItem("results", "")
