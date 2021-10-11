@@ -19,14 +19,18 @@ const urlStruct = {
   GET: {
     '/': htmlHandler.getIndexResponse,
     '/default-styles.css': htmlHandler.getDefaultCSS,
-
     '/recipes-json': responseHandler.getRecipes,
     '/recipes-client': htmlHandler.getRecipeClient,
+    '/recipes-playlist': responseHandler.getPlaylist,
+    '/recipes-admin': htmlHandler.getAdmin,
     '/recipe': htmlHandler.getRecipeHTML,
     notFound: htmlHandler.get404Response,
   },
   POST: {
     '/recipes-json': responseHandler.postRecipesJSON,
+    '/recipes-playlist': responseHandler.postRecipePlaylist,
+    '/recipes-update': responseHandler.changeRecipeName,
+    '/recipes-delete': responseHandler.deleteRecipe,
   },
   HEAD: {
 
@@ -40,20 +44,20 @@ const urlStruct = {
 // note that in this course we'll be using arrow functions 100% of the time in our server-side code
 
 const onRequest = (request, response) => {
-  // console.log(request.headers);
+  // //console.log(request.headers);
   const path = request.url;// request.url
   const params = url.parse(path, true);
   const { pathname } = params;
   const acceptedTypes = request.headers.accept.split(',');
   // getTags()
-  // console.log(path, pathname);
-  // console.log(request.headers);
+  // //console.log(path, pathname);
+  // //console.log(request.headers);
   const httpMethod = request.method;
-  console.log(httpMethod, pathname);
-  // console.log(params)
-  // console.log(httpMethod);
+  // console.log(httpMethod, path);
+  // //console.log(params)
+  // //console.log(httpMethod);
   if (urlStruct[httpMethod][pathname]) {
-    // console.log(params.query);
+    // //console.log(params.query);
     urlStruct[httpMethod][pathname](request, response, params, acceptedTypes, httpMethod);
   } else {
     urlStruct[httpMethod].notFound(request, response);
@@ -62,4 +66,4 @@ const onRequest = (request, response) => {
 
 // 8 - create the server, hook up the request handling function, and start listening on `port`
 http.createServer(onRequest).listen(port);
-console.log(`Listening on 127.0.0.1: ${port}`);
+// console.log(`Listening on 127.0.0.1: ${port}`);

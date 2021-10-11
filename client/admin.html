@@ -1,0 +1,213 @@
+<html>
+  <head>
+    <title>Project 1</title>
+    <link href="default-styles.css" type="text/css" rel="stylesheet" />
+  </head>
+  <body>
+    
+    <div id="links">
+        <h1>PLAYLIST/ADMIN PAGE</h1>
+        <p>
+          Front Endpoints:
+          <a href="/">Home,</a> <a href="javascript:void(0)" id="client">Recipe Client,</a>  <a href="/recipes-admin">Recipe Admin</a> Back Endpoints: <a href="/recipes-json">Recipes JSON</a> or <a href="/recipes-playlist">Recipe Playlist.</a>
+        
+        </p>
+      </div>
+      <p id="p">Rename a recipe or remove it from your list</p>
+    <div id="content" class="results">
+
+    </div>
+    
+    <script>
+
+
+      const handleResponse = (e) =>{
+        sessionStorage.setItem("playlist", e.target.responseText)
+      }
+    
+      const downloadRecipes = () => {
+        //console.log("Downloading Recipes");
+        
+        
+        const recipeURL = `/recipes-playlist`;
+        const xhr = new XMLHttpRequest();
+        
+        xhr.onload = (e)=> handleResponse(e)
+        
+        
+        xhr.open("GET", recipeURL);
+        xhr.setRequestHeader('Accept', "application/javascript");
+        xhr.send();
+      }
+      let save = (btn)=>{
+        ////console.log(btn.getAttribute("recipe"))
+        let idx
+        let id = btn.getAttribute("recipe")
+        let names = document.body.querySelectorAll('#foodName')//[idx]
+        let name
+        //console.log(names)
+        names.forEach((element, i) => {
+          console.log(element.getAttribute("recipe"))
+          if(element.getAttribute("recipe")===id){
+            name = element
+            idx = i
+            //console.log("Found")
+          }
+        });
+        let newName = document.body.querySelectorAll('#name')[idx].value
+        //console.log(idx)
+        if(newName === "" || newName=== undefined){
+          return
+        }
+        name.textContent = newName
+        let urlPath = `/recipes-update?id=${id}&name="${newName}"`
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", urlPath);
+        ////console.log(xhr.HEADERS_RECEIVED)
+        xhr.send();
+          
+        return true;
+        ////console.log(name)
+    }
+    let deleteRecipe = (btn)=>{
+        //console.log("DELETE")
+        let idx
+        let id = btn.getAttribute("recipe")
+        let items = document.body.querySelectorAll('#foodName')//[idx]
+     
+        let name
+        items.forEach((element, i) => {
+          console.log(element.getAttribute("recipe"))
+          if(element.getAttribute("recipe")===id){
+            name = element
+            idx = i
+          }
+        }); 
+        let urlPath = `/recipes-delete?id=${id}&name="${name.textContent}"`
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", urlPath);
+        ////console.log(xhr.HEADERS_RECEIVED)
+        xhr.send();
+        let parent = btn.parentElement.parentElement
+        parent.innerHTML = ""
+        ////console.log(parent)
+        //parent.innerHTML = ""
+          
+        return true;
+        ////console.log(name)
+    }
+      const displayRecipies = (dataString)=>{
+        //console.log("Parsing Recipies");
+        let content = document.body.querySelector('#content')
+        let data = dataString //.results
+        ////console.log(dataString.results);
+        //console.log(data);
+        let u = 0;
+       
+        //sessionStorage.setItem("results", "")
+        //console.log(data)
+        
+        data?.forEach(recipe => {
+          if(recipe != null){
+           // console.log(recipe)
+            let food = recipe.food 
+            let tag = recipe.tag
+            content.innerHTML+=`<div class="wrap">
+                    <img id="recipeImg" src=${recipe?.thumbnail} alt="">
+                    <h3 recipe="${recipe?.id}" id="foodName" for="name">${recipe?.name}</h3>
+                    <p><b>Food:</b> ${food}</p>
+                    <p><b>Tag:</b> ${tag}</p>
+                    <p><b>ID:</b> ${recipe?.id}</p>
+                    <input recipe="${recipe?.id}" id="name" name="name" value=""/>
+                    <div id="buttonWrap"><button idx=${u} recipe="${recipe?.id}" onclick="save(this)">Save Name</button> <button onclick="deleteRecipe(this)" idx=${u} recipe="${recipe?.id}">Delete</button></div>
+                 </div>`
+          }
+          
+          u++;
+        });
+       
+        //sessionStorage.setItem("results", "")
+      }
+
+      
+
+      const init = () => {
+        
+        let client = document.body.querySelector("#client")
+        client.onclick = ()=>{
+         // console.log("Click")
+          let food = sessionStorage.getItem("food")
+          let tag = sessionStorage.getItem("tag")
+          location.href=`/recipes-client?food=${food}&tag=${tag}`
+        }
+
+        downloadRecipes()
+        
+        getSessionStorage("playlist", (dataString)=>{
+          ////console.log(JSON.parse(dataString));
+          displayRecipies(JSON.parse(dataString))
+          ////console.log(dataString);
+          //displayRecipies(dataString)
+          //localStorage.setItem("results", "")
+        })
+        
+      }
+
+      
+      
+
+      const getRecipes = (food, tag)=>{
+        const data = null;
+        const xhr = new XMLHttpRequest();
+        xhr.withCredentials = false;
+
+        xhr.addEventListener("readystatechange", function () {
+          if (this.readyState === this.DONE) {
+            //console.log(this.responseText);
+            sessionStorage.setItem("recipies", this.responseText)
+          }
+        });
+
+        xhr.open("GET", "https://tasty.p.rapidapi.com/recipes/list?from=0&size=20&tags="+tag+"&q="+food);
+        xhr.setRequestHeader("x-rapidapi-host", "tasty.p.rapidapi.com");
+        xhr.setRequestHeader("x-rapidapi-key", "170e038a70mshc48a677384b7b29p120f51jsn123cfd31d18c");
+
+        xhr.send(data);
+      }
+      const getSessionStorage=(key, callback)=>{
+        let data = undefined
+        let time = setInterval(function (){
+            data = sessionStorage.getItem(key) 
+            
+            if(data != "" && data != null){
+              
+              callback(data)
+              clearInterval(time)
+                
+            }
+        }, 200);
+
+      }
+      const getStorage=(key, callback)=>{
+        let data = undefined
+        let time = setInterval(function (){
+            data = localStorage.getItem(key) 
+            
+            if(data != "" && data != null){
+              data = callback(data)
+              clearInterval(time)
+              //data = callback(data)
+              //return data
+              ////console.log(data);  
+            }
+           // return data
+        }, 200); 
+        ////console.log(time);  
+      }
+
+      
+      window.onload = init;
+     
+    </script>
+  </body>
+</html>

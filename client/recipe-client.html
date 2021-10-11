@@ -4,48 +4,62 @@
     <link href="default-styles.css" type="text/css" rel="stylesheet" />
   </head>
   <body>
-    <h1>RECIPE PAGE</h1>
-    <p>
-      See all endpoints 
-      <a href="/recipes-json">Recipes JSON</a> or <a href="/recipes-client">Recipe Client</a>
-    </p>
+    
+    <div id="links">
+      <h1>RECIPES FOUND</h1>
+      <p>
+        Front Endpoints:
+        <a href="/">Home,</a> <a href="/recipes-admin">Recipe Admin</a> Back Endpoints: <a href="/recipes-json">Recipes JSON</a> or <a href="/recipes-playlist">Recipe Playlist.</a>
+        
+      </p>
+    </div>
+    <p id="p">Select a recipe by clicking on the Recipe Title</p>
     <div id="content"></div>
     
     <script>
 
       
-
+      let loadRecipe = (element)=>{
+        let recipeid = element.getAttribute('recipe')
+        
+        let params = (new URL(document.location)).searchParams;
+        let recipePath = `/recipe?food=${params.get("food")}&tag=${params.get("tag")}&id=${recipeid}`
+        ////console.log(recipePath);
+        window.location = recipePath
+            ////console.log(element.getAttribute('path'));
+      }
       
 
       const handleResponse = (e, food, tag) =>{
         let userSearch = JSON.parse(e.target.response)
+        console.log(userSearch)
         if(userSearch== undefined){
-          console.log("UNDEFINED");
+          //console.log("UNDEFINED");
         }
-        //console.log(userSearch);
+        ////console.log(userSearch);
         let idx = 0;
         for (let i = 0; i < userSearch.length; i++) {
           const search = userSearch[i];
           let userFood = search.food
           let userTag = search.tag
-          //console.log(userFood, userTag);
+          ////console.log(userFood, userTag);
           if(food == userFood && tag == userTag){
             idx = i
-            // localStorage.setItem("results", JSON.stringify(userSearch))
+            // sessionStorage.setItem("results", JSON.stringify(userSearch))
               
           }
         }
         //displayRecipies(userSearch[idx])
-        //console.log(userSearch[idx]);
+        ////console.log(userSearch[idx]);
         sessionStorage.setItem("results", JSON.stringify(userSearch))
        
       }
 
       const downloadRecipes = () => {
-        console.log("Downloading Recipes");
+        //console.log("Downloading Recipes");
         // remember that an `Event` object gets passed along every time that an event handler or listener calls a function
         // the `target` property of that event points at the element that sent the event, in this case a button
-        //console.log(`An element of id=${e.target.id} was clicked!`);
+        ////console.log(`An element of id=${e.target.id} was clicked!`);
         let params = (new URL(document.location)).searchParams;
         let food = params.get("food");
         let tag = params.get("tag");
@@ -62,20 +76,20 @@
       }
       
       const displayRecipies = (dataString)=>{
-        console.log("Parsing Recipies");
+        //console.log("Parsing Recipies");
         let content = document.body.querySelector('#content')
         let data = dataString //.results
-        //console.log(dataString.results);
-        console.log(data);
+        ////console.log(dataString.results);
+       // //console.log(data);
         let u = 0;
         //sessionStorage.setItem("results", "")
-        data.results.forEach(recipe => {
-          console.log(recipe);
+        data?.results?.forEach(recipe => {
+          ////console.log(recipe);
           let recipeElement = document.createElement('recipe')
           
       
           if(u == 0){
-            //console.log(params);
+            ////console.log(params);
           }
          // sessionStorage.setItem("recipe", JSON.stringify(recipe))
                     
@@ -87,22 +101,25 @@
           u++;
         });
         
-        //localStorage.setItem("results", "")
+        //sessionStorage.setItem("results", "")
       }
 
       
 
       const init = () => {
         //localStorage.setItem("results", "")
-        console.log("Project 1 Init");
-        downloadRecipes()
+        //console.log("Project 1 Init");
+        if(sessionStorage.getItem("results") === null || sessionStorage.getItem("results")===""){
+          downloadRecipes()
+        }
+        
         
         getSessionStorage("results", (dataString)=>{
-          //console.log(dataString);
+          ////console.log(dataString);
           displayRecipies(JSON.parse(dataString))
-          //console.log(dataString);
+          ////console.log(dataString);
           //displayRecipies(dataString)
-          //localStorage.setItem("results", "")
+          //sessionStorage.setItem("results", "")
         })
         
       }
@@ -117,8 +134,8 @@
 
         xhr.addEventListener("readystatechange", function () {
           if (this.readyState === this.DONE) {
-            console.log(this.responseText);
-            localStorage.setItem("recipies", this.responseText)
+            //console.log(this.responseText);
+            sessionStorage.setItem("recipies", this.responseText)
           }
         });
 
@@ -152,11 +169,11 @@
               clearInterval(time)
               //data = callback(data)
               //return data
-              //console.log(data);  
+              ////console.log(data);  
             }
            // return data
         }, 200); 
-        //console.log(time);  
+        ////console.log(time);  
       }
 
       

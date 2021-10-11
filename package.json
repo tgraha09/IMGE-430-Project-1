@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Tests complete\"",
+    "chromeinspect": "node --inspect ./src/index.js & echo \"Now in DEBUG mode. Head to 'chrome://inspect'\"",
     "nodemon": "nodemon ./src/index.js -e js,html,css",
     "pretest": "eslint ./src --fix",
     "start": "node ./src/index.js"

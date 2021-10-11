@@ -7,7 +7,7 @@ const defaultCSS = fs.readFileSync(`${__dirname}/../client/default-styles.css`);
 
 const recipeHTML = fs.readFileSync(`${__dirname}/../client/recipe.html`);
 const recipeClient = fs.readFileSync(`${__dirname}/../client/recipe-client.html`);
-
+const recipeAdmin = fs.readFileSync(`${__dirname}/../client/admin.html`);
 const getDefaultCSS = (request, response) => {
   response.writeHead(200, { 'Content-Type': 'text/css' });
   response.write(defaultCSS);
@@ -44,6 +44,12 @@ const getJokeClient = (request, response) => {
   response.end();
 };
 
+const getAdmin = (request, response) => {
+  response.writeHead(200, { 'Content-Type': 'text/html' });
+  response.write(recipeAdmin);
+  response.end();
+};
+
 module.exports = {
   getIndexResponse,
   get404Response,
@@ -51,4 +57,5 @@ module.exports = {
   getJokeClient,
   getRecipeClient,
   getRecipeHTML,
+  getAdmin,
 };

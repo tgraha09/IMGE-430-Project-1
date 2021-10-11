@@ -6,40 +6,63 @@
     <link href="default-styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
-    <h2>SELECTED RECIPE</h2>
-    <a href="/recipes-json">Recipes JSON</a> or <a href="/recipes-client">Recipe Client</a>
-    <button id="save">Save Recipe</button>
-    <img id="recipeImg" src="#" alt="">
-    <div id="details">
-      
+    
+    <div id="links">
+      <h1>SELECTED RECIPE</h1>
+      <p>
+        Front Endpoints:
+        <a href="/">Home,</a> <a href="/recipes-admin"></a> <a href="javascript:void(0)" id="client">Recipe Client,</a> <a href="/recipes-admin">Recipe Admin</a> Back Endpoints: <a href="/recipes-json">Recipes JSON</a> or <a href="/recipes-playlist">Recipe Playlist.</a>
+        
+      </p>
+    </div>
+    <p id="p">Hit the "Save Recipe" button to store a recipe in your list</p>
+    <div id="sel">
+      <div id="selected">
+        <button id="save">Save Recipe</button>
+        <img id="recipeImg" src="#" alt="">
+        <div id="details">
+      </div>
+    </div>
     </div>
     <script>
 
-      
+      const handleResponse = (e, food, tag, id) =>{
+         // let userSearch = JSON.parse(e.target.response)
+          
+        
+      }
 
-        const sendAjax = (url, method, acceptedType) => {
-          console.log(url,acceptedType);
+        const sendAjax = () => {
+         
+          
+          let params = (new URL(document.location)).searchParams;
+          let food = params.get("food")|| sessionStorage.getItem("food")
+          console.log(food)
+          let tag = params.get("tag") || sessionStorage.getItem("tag")
+          let id = params.get("id");
+          let name = document.body.querySelector('#name').textContent
+          name = name.replace('&', "and")
+          let thumbnail = document.body.querySelector('#recipeImg').src
+          ////console.log(thumbnail)
+          let urlPath = `/recipes-playlist?food=${food}&tag=${tag}&id=${id}&name="${name}"&thumbnail=${thumbnail}`
           const xhr = new XMLHttpRequest();
-          
-          xhr.open(method, url);
-          xhr.setRequestHeader('Accept', acceptedType);
-          
-          xhr.onload = () => handleRecipies(xhr);
-      
+          xhr.open("POST", urlPath);
+          //////console.log(xhr.HEADERS_RECEIVED)
           xhr.send();
           
+          return true;
         };
   
         
         const getRecipe = () => {
           // remember that an `Event` object gets passed along every time that an event handler or listener calls a function
           // the `target` property of that event points at the element that sent the event, in this case a button
-          //console.log(`An element of id=${e.target.id} was clicked!`);
+          //////console.log(`An element of id=${e.target.id} was clicked!`);
           let params = (new URL(document.location)).searchParams;
-          let food = params.get("food");
-          let tag = params.get("tag");
+          let food = params.get("food")// || sessionStorage.getItem("food")
+          let tag = params.get("tag") //|| sessionStorage.getItem("tag")
           let id = params.get("id")
-          console.log(id);
+          console.log(food)
           const data = null;
           const xhr = new XMLHttpRequest();
           xhr.withCredentials = false;
@@ -48,7 +71,7 @@
             if (this.readyState === this.DONE) {
               //sessionStorage.setItem("recipe", this.responseText)
               let json = JSON.parse(this.responseText)
-              //console.log(json);
+              //////console.log(json);
               const recipe = {
                 name: json.name,
                 description: json.description,
@@ -69,16 +92,16 @@
                 topics: json.topics,
                 rating: json.user_ratings,
               };
-              console.log(recipe);
+              ////console.log(recipe);
               
               let displayImg = document.body.querySelector("#recipeImg")
               displayImg.src = recipe.thumbnail
               let details = document.querySelector("#details")
-              details.innerHTML = `<h2>${recipe.name}</h2>
+              details.innerHTML = `<h2 id="name">${recipe.name}</h2>
               <p>${recipe.description}</p>
               <h2>Instructions:</h2>
               ${instructions(recipe.instructions)}`
-              //console.log(this.responseText);
+              //////console.log(this.responseText);
             }
           });
 
@@ -92,11 +115,24 @@
         
   
         const init = () => {
-          console.log("Recipe Init");
+          ////console.log("Recipe Init");
           getRecipe()
-          getSessionStorage("recipe", (dataString)=>{
+          let client = document.body.querySelector("#client")
+          client.onclick = ()=>{
+          // console.log("Click")
+            let food = sessionStorage.getItem("food")
+            let tag = sessionStorage.getItem("tag")
+            location.href=`/recipes-client?food=${food}&tag=${tag}`
+          }
+          let saveButton = document.body.querySelector('#save')
+          saveButton.onclick = ()=>{
+            sendAjax()
+            saveButton.disabled = true
+          }
+
+          /*getSessionStorage("recipe", (dataString)=>{
             
-          })
+          })*/
 
         }
 
@@ -105,7 +141,7 @@
           orderedList.id = "instructions"
           instructObj.forEach(obj => {
             orderedList.innerHTML+= `<li>${obj.display_text}</li>`
-            //console.log(obj.display_text);
+            //////console.log(obj.display_text);
           });
           return orderedList.outerHTML
         }
@@ -135,11 +171,11 @@
                 clearInterval(time)
                 //data = callback(data)
                 //return data
-                //console.log(data);  
+                //////console.log(data);  
               }
              // return data
           }, 200); 
-          //console.log(time);  
+          //////console.log(time);  
         }
   
         

@@ -4,36 +4,74 @@
     <link href="default-styles.css" type="text/css" rel="stylesheet" />
   </head>
   <body>
-    <h1>CLIENT PAGE</h1>
-    <p>
-      See all endpoints 
-      <a href="/recipes-json">Recipes JSON</a> or <a href="/recipes-client">Recipe Client</a>
+    
+    <div id="links">
+      <h1>Recipe Finder</h1>
+      <p>
+        Front Endpoints:
+        <a href="javascript:void(0)" id="client">Recipe Client,</a>  <a href="/recipes-admin">Recipe Admin</a> Back Endpoints: <a href="/recipes-json">Recipes JSON</a> or <a href="/recipes-playlist">Recipe Playlist.</a>
+      </p>
+    </div>
+    <p id="p">
+      Search a recipe by its food and cuisine tag.
     </p>
-    <form id="searchform" method="POST" action="/recipes-json">
-      <div>
-        <label for="food">Food Name or Ingredient</label><br>
-        <input type="text" id="food" name="food" value="Chicken"><br>
+    <form id="searchform" method="POST" action="/recipes-json" >
+      <div id="formwrap">
+        <div id="foodWrap">
+          <label for="food">Pick Food</label><br>
+          <input type="text" id="food" name="food" value="Chicken"><br>
+        </div>
+        
+        <div id="tagWrap">
+          <label for="tag">Select Tag</label><br>
+          <input class="tagInput" type="text" name="tag" list="recipeTags" />
+          <datalist  name="recipeTags" id="recipeTags" >
+            <option id="tag" ></option>
+          </datalist>
+          
+        </div>
+        <input id="submitbtn" type="submit" ></input>
       </div>
       
-      <div id="tagWrap">
-        <label for="tag">Select Tag</label><br>
-        <input class="tagInput" type="text" name="tag" list="recipeTags"/>
-        <datalist  name="recipeTags" id="recipeTags">
-          <option id="tag" value="american"></option>
-        </datalist>
-      </div>
     </form> 
-    <input id="submitbtn" type="submit"></input>
+    
     <script>
     
+      const search = (e)=>{
 
+        //console.log("FORM BUTTON");
+        let recipeTagInput = document.body.querySelector('.tagInput')
+        let searchFood = document.body.querySelector('#food')
+        let food = searchFood.value
+        let tag = recipeTagInput.value
+        sessionStorage.setItem("food", food)
+        sessionStorage.setItem("tag", tag)
+        const formAction = searchform.getAttribute("action");
+        const formMethod = searchform.getAttribute("method");
+        let data = `food=${food}&tag=${tag}` //`/recipes-client?food=${food}&tag=${tag}`
+        //console.log(data)
+        //searchform.action = `/recipes-json?${data}`
+        sendAjax(e, searchform, food, tag)
+        //downloadRecipes(food, tag)
+        setTimeout(() => {
+          
+          location.href=`/recipes-client?food=${food}&tag=${tag}`
+        }, 2000);
+      }
+      
       const init = () => {//form="searchform"
-        sessionStorage.clear()
-        //getTags()
-        console.log("Project 1 Init");
+      //sessionStorage.setItem('results', null)
+      sessionStorage.removeItem('results')
+      if(sessionStorage.getItem("tagsList") === null || sessionStorage.getItem("tagsList")===""){
+        
         getTags()
+      }
+        
         let recipeTags = document.body.querySelector('#recipeTags')
         let recipeTagInput = document.body.querySelector('.tagInput')
+        let client = document.body.querySelector('#client')
+        client.onclick = search
+        recipeTagInput.textContent = "ok"
         recipeTagInput.recipeTags = []
         
         let searchFood = document.body.querySelector('#food')
@@ -43,7 +81,7 @@
           
           let tags = JSON.parse(data).results
           tags.forEach(tag => {
-          //console.log(tag);
+          ////console.log(tag);
           let tagValue = tag.name
           let tagName = tag.display_name
           let option = document.createElement("option")
@@ -61,20 +99,8 @@
         let button = document.body.querySelector('#submitbtn')
         button.onclick=(e)=>{
           //e.preventDefault()
-          console.log("FORM BUTTON");
-           
-          let food = searchFood.value
-          let tag = recipeTagInput.value
-          const formAction = searchform.getAttribute("action");
-          const formMethod = searchform.getAttribute("method");
-          let data = `food=${food}&tag=${tag}` //`/recipes-client?food=${food}&tag=${tag}`
-          //searchform.action = `/recipes-json?${data}`
-          sendAjax(e, searchform, food, tag)
-          //downloadRecipes(food, tag)
-          setTimeout(() => {
-            
-            location.href=`/recipes-client?food=${food}&tag=${tag}`
-          }, 2000);
+          //console.log("FORM BUTTON");
+          search(e)
           
          //searchform.submit()
           //searchform.action = `/recipes-json?${data}`
@@ -89,11 +115,11 @@
 
       const sendAjax = (e, searchform, food, tag)=>{
         e.preventDefault();
-        console.log("SENDING AJAX");
+        //console.log("SENDING AJAX");
         const formAction = searchform.getAttribute("action");
         const formMethod = searchform.getAttribute("method");
-        let data = `${formAction}?food=${food}&tag=${tag}&click=${true}` //`/recipes-client?food=${food}&tag=${tag}`
-        //searchform.setAttribute("action", data)
+        let data = `${formAction}?food=${food}&tag=${tag}` //`/recipes-client?food=${food}&tag=${tag}`
+        //searchform.setAttribute("action", data)&click=${true}
         
         const xhr = new XMLHttpRequest();
         xhr.open(formMethod,data); // NEW - in the past we've been using "GET"
@@ -105,28 +131,6 @@
       }
 
       
-
-     
-      
-
-      const getRecipes = (food, tag)=>{
-        const data = null;
-        const xhr = new XMLHttpRequest();
-        xhr.withCredentials = false;
-
-        xhr.addEventListener("readystatechange", function () {
-          if (this.readyState === this.DONE) {
-            console.log(this.responseText);
-            localStorage.setItem("recipies", this.responseText)
-          }
-        });
-
-        xhr.open("GET", "https://tasty.p.rapidapi.com/recipes/list?from=0&size=20&tags="+tag+"&q="+food);
-        xhr.setRequestHeader("x-rapidapi-host", "tasty.p.rapidapi.com");
-        xhr.setRequestHeader("x-rapidapi-key", "170e038a70mshc48a677384b7b29p120f51jsn123cfd31d18c");
-
-        xhr.send(data);
-      }
       const getSessionStorage=(key, callback)=>{
         let data = undefined
         let time = setInterval(function (){
@@ -151,17 +155,17 @@
               clearInterval(time)
               //data = callback(data)
               //return data
-              //console.log(data);  
+              ////console.log(data);  
             }
            // return data
         }, 200); 
-        //console.log(time);  
+        ////console.log(time);  
       }
 
       
 
       const getTags = ()=>{
-        sessionStorage.clear()
+        //sessionStorage.clear()
         //localStorage.setItem("results", "")
         const data = null;
         const xhr = new XMLHttpRequest();
@@ -171,7 +175,7 @@
         xhr.addEventListener("readystatechange", function () {
           if (this.readyState === this.DONE) {
             localStorage.setItem("tagsList", this.responseText)
-            //console.log(this.responseText);
+            ////console.log(this.responseText);
           }
         });
 
