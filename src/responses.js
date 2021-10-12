@@ -185,7 +185,13 @@ const buildXML = (data) => {
         });
         return displayString;
       };
-      const recipeElement = `<SearchItem timeSearched="${search?.searchedAt}" name="${search?.name}"  food="${search.food}" tag="${search.tag}" id="${search.id}"> 
+      let searchedAt;
+      if (search.searchedAt === null || search.searchedAt === undefined) {
+        searchedAt = '';
+      } else {
+        searchedAt = `timeSearched="${search?.searchedAt}"`;
+      }
+      const recipeElement = `<SearchItem ${searchedAt} name="${search?.name}"  food="${search.food}" tag="${search.tag}" id="${search.id}"> 
           ${processXML()}
       </SearchItem>`;
 
@@ -435,6 +441,50 @@ const getRecipesMeta = (request, response, params, acceptedTypes, httpMethod) =>
   }
 };
 
+const getPlaylistMeta = (request, response, params, acceptedTypes, httpMethod) => {
+  const { food, tag } = params.query;
+  if (food === undefined || tag === undefined) {
+    // console.log("No search querys found")
+    /* No search querys found */
+    if (userRecipes.length === 0) {
+      userRecipes.push(temp);
+      // userSearchParameters.push(defaultRecipe)
+    }
+    /// /console.log(userSearchParameters)
+    if (acceptedTypes.includes('text/xml')) {
+      const content = buildXML(userRecipes);
+
+      respondMeta(request, response, 200, content, 'text/xml');
+    } else {
+      /// /console.log(recipe)
+      // const content = buildXML(userSearchParameters);
+      respondMeta(request, response, 200, JSON.stringify(userRecipes), 'application/json');
+    }
+  } else {
+    let recipe;
+    for (let i = 0; i < userRecipes.length; i += 1) {
+      const recipeObj = userRecipes[i];
+      if (recipeObj.food === food && recipeObj.tag === tag) {
+        recipe = recipeObj;
+      }
+    }
+    if (recipe !== undefined) {
+      // console.log("normal GET from querys")
+      /* normal GET from querys */
+      if (acceptedTypes.includes('text/xml')) {
+        const content = buildXML(recipe);
+        respondMeta(request, response, 200, content, 'text/xml');
+      } else {
+        // //console.log(recipe)
+        respondMeta(request, response, 200, JSON.stringify(recipe), 'application/json');
+      }
+    } else {
+      // console.log("Correct query search, incorrect search terms")
+      notCorrect(request, response, acceptedTypes);
+    }
+  }
+};
+
 const getRecipes = (request, response, params, acceptedTypes, httpMethod) => {
   const { food, tag } = params.query;
   if (food === undefined || tag === undefined) {
@@ -495,8 +545,8 @@ const getPlaylist = (request, response, params, acceptedTypes, httpMethod) => {
     }
 
     if (acceptedTypes.includes('text/xml')) {
-      // const content = buildXML(userSearchParameters);
-      // respond(request, response, 200, content, 'text/xml');
+      const content = buildXML(userRecipes);
+      respond(request, response, 200, content, 'text/xml');
     } else {
       /// /console.log(recipe)
       // const content = buildXML(userSearchParameters);
@@ -534,6 +584,7 @@ module.exports = {
   postRecipePlaylist,
   getPlaylist,
   getRecipesMeta,
+  getPlaylistMeta,
   changeRecipeName,
   deleteRecipe,
 };

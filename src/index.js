@@ -35,6 +35,7 @@ const urlStruct = {
   HEAD: {
 
     '/recipes-json': responseHandler.getRecipesMeta,
+    '/recipes-playlist': responseHandler.getPlaylistMeta,
     notFound: responseHandler.notFound,
   },
 };
